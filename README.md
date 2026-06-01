@@ -62,6 +62,12 @@ src/
 5. Save final test outputs in `results/test_outputs/`.
 6. Write down decisions and failed attempts in `docs/experiment_log.md`.
 
+The experiment log is here:
+
+```text
+docs/experiment_log.md
+```
+
 ## Section 4.1 Modelling Checklist
 
 Section 4.1 of the assignment is about modelling the system dynamics.
@@ -182,6 +188,38 @@ python assignment_files/gym-unbalanced-disk/disc-benchmark-files/submission-file
 ```
 
 For final submission, the LSTM files are currently the better ANN outputs to share because they perform better on our held-out split.
+
+## Compare The ANN Models
+
+To make plots and CSV files comparing the simple NARX ANN with the advanced LSTM ANN, run:
+
+```bash
+python -m src.compare_ann_models
+```
+
+This creates:
+
+```text
+results/plots/ann_model_scores.csv
+results/plots/ann_simulation_comparison.csv
+results/plots/ann_prediction_comparison.png
+results/plots/ann_simulation_comparison.png
+results/plots/ann_error_barplot.png
+```
+
+The current comparison run gave:
+
+```text
+simple NARX ANN:
+  prediction RMSE = 0.0426 rad = 2.44 degrees
+  simulation RMSE = 0.2815 rad = 16.13 degrees
+
+advanced LSTM ANN:
+  prediction RMSE = 0.00833 rad = 0.477 degrees
+  simulation RMSE = 0.0435 rad = 2.50 degrees
+```
+
+This is useful for the report because it clearly shows why the LSTM is the stronger ANN result.
 
 The older generic script also exists. It expects a CSV file with an input column and an output column.
 

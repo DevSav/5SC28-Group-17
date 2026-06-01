@@ -81,3 +81,21 @@ What went well: The LSTM performed much better than the simple NARX model on bot
 What did not work: This is still only tested on our own held-out split. The hidden-test true outputs are not available, so the checker only confirms file format.
 
 Next step: Use the LSTM `.npz` outputs as the current ANN submission files unless a better model is trained later.
+
+## 2026-06-01 ANN Comparison Plots
+
+Date: 2026-06-01
+
+Person: Group 17 ANN part
+
+Goal: Make figures and CSV files comparing the simple ANN and advanced ANN.
+
+Method: Trained the simple NARX ANN and advanced LSTM ANN on the same train/validation/test split, then plotted prediction, simulation, and RMSE bars.
+
+Result: The comparison files are saved in `results/plots/`. In this run, the LSTM had prediction RMSE about 0.477 degrees and simulation RMSE about 2.50 degrees. The simple NARX ANN had prediction RMSE about 2.44 degrees and simulation RMSE about 16.13 degrees.
+
+What went well: The plots clearly show that the LSTM is better for both prediction and simulation.
+
+What did not work: These are still held-out split results, not official hidden-test scores.
+
+Next step: Use the plots in the report and explain why the recurrent model handles simulation better.
