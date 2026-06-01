@@ -6,19 +6,16 @@ from torch import nn
 
 
 def make_narx_data(u, y, input_delay=3, output_delay=3):
-    """Make delayed inputs for a simple NARX model.
-
-    We predict y[k] from old inputs and old measured outputs:
-    [u[k-3], u[k-2], u[k-1], y[k-3], y[k-2], y[k-1]] -> y[k]
-    """
+    """Make the NARX input-output data like in the practical session."""
     u = np.asarray(u).reshape(-1)
     y = np.asarray(y).reshape(-1)
 
     first_index = max(input_delay, output_delay)
-    inputs = []
-    targets = []
+    X = []
+    Y = []
 
     for k in range(first_index, len(y)):
+        # One row is [old u values, old y values] and the target is y[k].
         row = []
 
         for delay in range(input_delay, 0, -1):
@@ -27,33 +24,33 @@ def make_narx_data(u, y, input_delay=3, output_delay=3):
         for delay in range(output_delay, 0, -1):
             row.append(y[k - delay])
 
-        inputs.append(row)
-        targets.append(y[k])
+        X.append(row)
+        Y.append(y[k])
 
-    return np.array(inputs, dtype=np.float32), np.array(targets, dtype=np.float32).reshape(-1, 1)
+    X = np.array(X, dtype=np.float32)
+    Y = np.array(Y, dtype=np.float32).reshape(-1, 1)
+    return X, Y
 
 
-class SmallNeuralNetwork(nn.Module):
-    """A small feedforward neural network."""
+class Network(nn.Module):
+    """Small feedforward ANN, based on the Lecture 2 practical."""
 
-    def __init__(self, number_of_inputs, hidden_neurons=20):
+    def __init__(self, n_inputs, n_hidden_nodes=20):
         super().__init__()
-
-        self.layers = nn.Sequential(
-            nn.Linear(number_of_inputs, hidden_neurons),
-            nn.Tanh(),
-            nn.Linear(hidden_neurons, 1),
-        )
+        self.lay1 = nn.Linear(n_inputs, n_hidden_nodes)
+        self.lay2 = nn.Linear(n_hidden_nodes, 1)
 
     def forward(self, x):
-        return self.layers(x)
+        x1 = torch.sigmoid(self.lay1(x))
+        y = self.lay2(x1)
+        return y
 
 
 class ANNModel:
-    """Simple ANN model for the unbalanced disc angle."""
+    """Small wrapper around the ANN so prediction and simulation are easy."""
 
     def __init__(self, number_of_inputs, hidden_neurons=20, learning_rate=0.001, l2_weight=0.0001):
-        self.model = SmallNeuralNetwork(number_of_inputs, hidden_neurons)
+        self.model = Network(number_of_inputs, hidden_neurons)
         self.learning_rate = learning_rate
         self.l2_weight = l2_weight
         self.x_mean = None
@@ -70,59 +67,58 @@ class ANNModel:
     def _unscale_y(self, y_scaled):
         return y_scaled * self.y_std + self.y_mean
 
-    def fit(self, train_inputs, train_outputs, validation_inputs, validation_outputs, epochs=1000, patience=40):
-        """Train the ANN with early stopping."""
-        train_inputs = np.asarray(train_inputs, dtype=np.float32)
-        train_outputs = np.asarray(train_outputs, dtype=np.float32)
-        validation_inputs = np.asarray(validation_inputs, dtype=np.float32)
-        validation_outputs = np.asarray(validation_outputs, dtype=np.float32)
+    def fit(self, Xtrain, Ytrain, Xval, Yval, epochs=1000, patience=40):
+        """Train the ANN. This follows the practical notebook training loop."""
+        Xtrain = np.asarray(Xtrain, dtype=np.float32)
+        Ytrain = np.asarray(Ytrain, dtype=np.float32)
+        Xval = np.asarray(Xval, dtype=np.float32)
+        Yval = np.asarray(Yval, dtype=np.float32)
 
-        self.x_mean = train_inputs.mean(axis=0, keepdims=True)
-        self.x_std = train_inputs.std(axis=0, keepdims=True) + 1e-8
-        self.y_mean = train_outputs.mean(axis=0, keepdims=True)
-        self.y_std = train_outputs.std(axis=0, keepdims=True) + 1e-8
+        # Normalize using only the training data.
+        self.x_mean = Xtrain.mean(axis=0, keepdims=True)
+        self.x_std = Xtrain.std(axis=0, keepdims=True) + 1e-8
+        self.y_mean = Ytrain.mean(axis=0, keepdims=True)
+        self.y_std = Ytrain.std(axis=0, keepdims=True) + 1e-8
 
-        x_train = torch.tensor(self._scale_x(train_inputs))
-        y_train = torch.tensor(self._scale_y(train_outputs))
-        x_val = torch.tensor(self._scale_x(validation_inputs))
-        y_val = torch.tensor(self._scale_y(validation_outputs))
+        Xtrain = torch.as_tensor(self._scale_x(Xtrain))
+        Ytrain = torch.as_tensor(self._scale_y(Ytrain))
+        Xval = torch.as_tensor(self._scale_x(Xval))
+        Yval = torch.as_tensor(self._scale_y(Yval))
 
         optimizer = torch.optim.Adam(
             self.model.parameters(),
             lr=self.learning_rate,
             weight_decay=self.l2_weight,
         )
-        loss_function = nn.MSELoss()
 
-        best_validation_loss = float("inf")
+        best_val_loss = float("inf")
         best_state = None
-        epochs_without_improvement = 0
+        no_improvement = 0
 
         for epoch in range(epochs):
             self.model.train()
-            prediction = self.model(x_train)
-            train_loss = loss_function(prediction, y_train)
+            Ypred = self.model(Xtrain)
+            Loss = torch.mean((Ypred - Ytrain) ** 2)
 
             optimizer.zero_grad()
-            train_loss.backward()
+            Loss.backward()
             optimizer.step()
 
-            self.model.eval()
             with torch.no_grad():
-                validation_prediction = self.model(x_val)
-                validation_loss = loss_function(validation_prediction, y_val).item()
+                Yval_pred = self.model(Xval)
+                val_loss = torch.mean((Yval_pred - Yval) ** 2).item()
 
-            if validation_loss < best_validation_loss:
-                best_validation_loss = validation_loss
+            if val_loss < best_val_loss:
+                best_val_loss = val_loss
                 best_state = copy.deepcopy(self.model.state_dict())
-                epochs_without_improvement = 0
+                no_improvement = 0
             else:
-                epochs_without_improvement += 1
+                no_improvement += 1
 
             if epoch % 100 == 0:
-                print("epoch", epoch, "train loss", round(train_loss.item(), 5), "validation loss", round(validation_loss, 5))
+                print("epoch", epoch, "train loss", round(Loss.item(), 5), "validation loss", round(val_loss, 5))
 
-            if epochs_without_improvement >= patience:
+            if no_improvement >= patience:
                 print("Stopped early at epoch", epoch)
                 break
 
@@ -145,19 +141,19 @@ class ANNModel:
         u = np.asarray(u).reshape(-1)
         y_start = list(np.asarray(y_start).reshape(-1))
 
-        y_simulated = y_start.copy()
-        first_index = len(y_start)
+        Ysim = y_start.copy()
+        start_index = len(y_start)
 
-        for k in range(first_index, len(u)):
+        for k in range(start_index, len(u)):
             row = []
 
             for delay in range(input_delay, 0, -1):
                 row.append(u[k - delay])
 
             for delay in range(output_delay, 0, -1):
-                row.append(y_simulated[k - delay])
+                row.append(Ysim[k - delay])
 
             next_y = self.predict(np.array([row], dtype=np.float32))[0]
-            y_simulated.append(next_y)
+            Ysim.append(next_y)
 
-        return np.array(y_simulated)
+        return np.array(Ysim)

@@ -45,10 +45,10 @@ This matches the lecture idea that a feedforward ANN can represent the static no
 The network is deliberately small:
 
 ```text
-input layer -> tanh hidden layer -> output layer
+input layer -> sigmoid hidden layer -> output layer
 ```
 
-I used `tanh` because it is a standard smooth nonlinear activation function and it was also used in the lecture examples.
+I used `sigmoid` because the Lecture 2 practical ANN examples use sigmoid hidden layers.
 
 The network is not very deep. This is a conscious choice:
 
