@@ -85,6 +85,14 @@ Current ANN status:
 - Done: held-out validation/test split is used before creating hidden-test outputs.
 - Not done yet: advanced ANN architecture. A simple next option is an RNN/LSTM or a small NOE-style recurrent model.
 
+Practical session check:
+
+- Lecture 2 ANN practical uses PyTorch for neural networks and backpropagation.
+- Lecture 2 also has an ANN for NARX exercise.
+- That NARX exercise builds rows like `[old inputs, old outputs] -> next output`.
+- Lecture 3 Deep Learning practical uses train/validation splitting, normalization, Adam, and recurrent models.
+- Our simple ANN follows this practical-session style, but with the real unbalanced-disc data.
+
 ## Run The Simple ANN Model
 
 The first ANN model is a small NARX neural network.
