@@ -61,3 +61,23 @@ What went well: The code now matches the practical session style better, and the
 What did not work: One-step prediction became worse than the previous tanh version.
 
 Next step: Try both activation functions again later and report the trade-off. Also add an advanced ANN architecture, for example RNN/LSTM or NOE-style recurrent model.
+
+## 2026-06-01 Advanced ANN LSTM
+
+Date: 2026-06-01
+
+Person: Group 17 ANN part
+
+Goal: Add the advanced ANN architecture required by section 4.1.
+
+Method: LSTM model. Each training sample is a short sequence of old voltage and angle values, and the target is the next angle.
+
+Settings: 15 history samples, LSTM hidden size 20, 80 epochs, Adam optimizer.
+
+Result: On a held-out test split, prediction RMSE was about 0.00715 rad, which is about 0.410 degrees. Simulation RMSE was about 0.0367 rad, which is about 2.10 degrees.
+
+What went well: The LSTM performed much better than the simple NARX model on both prediction and simulation.
+
+What did not work: This is still only tested on our own held-out split. The hidden-test true outputs are not available, so the checker only confirms file format.
+
+Next step: Use the LSTM `.npz` outputs as the current ANN submission files unless a better model is trained later.

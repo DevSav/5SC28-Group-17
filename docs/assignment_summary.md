@@ -25,12 +25,14 @@ We need:
 Current ANN branch status:
 
 - simple ANN model: NARX feedforward neural network;
+- advanced ANN model: LSTM recurrent neural network;
 - input used: motor voltage `u`;
 - output used: measured angle `th`;
 - angular velocity: not used;
 - validation/test: chronological train, validation, and test split;
 - generated files: hidden prediction and simulation `.npz` output files;
-- still required later: one more advanced ANN architecture, for example RNN/LSTM or NOE-style recurrent model.
+- provided checker: runs on the generated hidden prediction and simulation files;
+- best current ANN result: LSTM, because it has better held-out prediction and simulation results.
 
 ## Part 2: Swing-Up Policy
 

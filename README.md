@@ -81,9 +81,10 @@ Required:
 Current ANN status:
 
 - Done: simple ANN NARX baseline.
+- Done: advanced ANN LSTM model.
 - Done: prediction and simulation output files are generated.
 - Done: held-out validation/test split is used before creating hidden-test outputs.
-- Not done yet: advanced ANN architecture. A simple next option is an RNN/LSTM or a small NOE-style recurrent model.
+- Done: provided submission checker runs on the generated files.
 
 Practical session check:
 
@@ -91,11 +92,12 @@ Practical session check:
 - Lecture 2 also has an ANN for NARX exercise.
 - That NARX exercise builds rows like `[old inputs, old outputs] -> next output`.
 - Lecture 3 Deep Learning practical uses train/validation splitting, normalization, Adam, and recurrent models.
-- Our simple ANN follows this practical-session style, but with the real unbalanced-disc data.
+- Our simple ANN follows the Lecture 2 NARX style, but with the real unbalanced-disc data.
+- Our advanced ANN follows the Lecture 3 recurrent model style, but with the real unbalanced-disc data.
 
 ## Run The Simple ANN Model
 
-The first ANN model is a small NARX neural network.
+The first ANN model is a small NARX neural network. This is the simple ANN result required in section 4.1.
 
 NARX means the network predicts the next angle from old voltages and old measured angles:
 
@@ -137,6 +139,49 @@ Optional settings:
 ```bash
 python -m src.train_ann_assignment --input-delay 15 --output-delay 15 --hidden-neurons 50 --epochs 1500
 ```
+
+## Run The Advanced ANN Model
+
+The second ANN model is a small LSTM model. This is the advanced ANN result required in section 4.1.
+
+The LSTM uses short sequences:
+
+```text
+[[old voltage, old angle], ...] -> next measured angle
+```
+
+Run it with:
+
+```bash
+python -m src.train_lstm_ann_assignment
+```
+
+It creates:
+
+```text
+results/models/ann_lstm_assignment_model.pt
+results/test_outputs/ann_lstm_hidden_prediction_submission.npz
+results/test_outputs/ann_lstm_hidden_simulation_submission.npz
+```
+
+Latest held-out split result:
+
+```text
+Prediction RMSE: 0.007152 rad = 0.4098 degrees
+Simulation RMSE: 0.036689 rad = 2.1021 degrees
+```
+
+These are not the official hidden-test scores. They are our own train/validation/test split scores from `training-val-test-data.npz`.
+
+The provided checker can be used to check the output file format:
+
+```bash
+python assignment_files/gym-unbalanced-disk/disc-benchmark-files/submission-file-checker.py results/test_outputs/ann_lstm_hidden_prediction_submission.npz assignment_files/gym-unbalanced-disk/disc-benchmark-files/hidden-test-prediction-submission-file.npz
+
+python assignment_files/gym-unbalanced-disk/disc-benchmark-files/submission-file-checker.py results/test_outputs/ann_lstm_hidden_simulation_submission.npz assignment_files/gym-unbalanced-disk/disc-benchmark-files/hidden-test-simulation-submission-file.npz
+```
+
+For final submission, the LSTM files are currently the better ANN outputs to share because they perform better on our held-out split.
 
 The older generic script also exists. It expects a CSV file with an input column and an output column.
 

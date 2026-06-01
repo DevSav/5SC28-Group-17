@@ -103,12 +103,19 @@ This difference is important in system identification and is mentioned in the le
 
 ## What To Improve Later
 
-This first ANN is a simple baseline. Later we can try:
+The feedforward NARX ANN is the simple baseline.
+
+The LSTM ANN is the more advanced architecture. It is more advanced because it processes a short sequence of old voltage and angle values using a recurrent neural network layer.
+
+Current comparison:
+
+- NARX feedforward ANN: simple and easy to explain.
+- LSTM ANN: more advanced and gave better held-out prediction and simulation results.
+
+Later we can still try:
 
 - different delays;
 - more hidden neurons;
-- a second hidden layer;
-- a recurrent neural network;
 - comparing NARX and NOE-style simulation.
 
 For the report, we should not only show the best result. We should also explain what we tried and why.
