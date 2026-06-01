@@ -22,6 +22,16 @@ We need:
 - prediction and simulation tests;
 - clear motivation for all model choices.
 
+Current ANN branch status:
+
+- simple ANN model: NARX feedforward neural network;
+- input used: motor voltage `u`;
+- output used: measured angle `th`;
+- angular velocity: not used;
+- validation/test: chronological train, validation, and test split;
+- generated files: hidden prediction and simulation `.npz` output files;
+- still required later: one more advanced ANN architecture, for example RNN/LSTM or NOE-style recurrent model.
+
 ## Part 2: Swing-Up Policy
 
 This part is 40 percent of the project grade.
@@ -42,4 +52,3 @@ We need one policy that:
 - swings the pendulum from the bottom to the top;
 - tracks a reference around the top position;
 - does not use a switching controller made from separate single-target policies.
-

@@ -35,6 +35,8 @@ The rubric mainly checks:
 ## Repository Structure
 
 ```text
+assignment_files/
+  gym-unbalanced-disk/  Required benchmark data, simulator, and checker files.
 data/
   raw/                 Original downloaded data. Do not edit these files.
   processed/           Cleaned data used by our scripts.
@@ -53,16 +55,82 @@ src/
 
 ## Simple Workflow
 
-1. Put the downloaded benchmark data in `data/raw/`.
-2. Use notebooks for quick experiments.
-3. Move working code into `src/`.
+1. Use the files in `assignment_files/gym-unbalanced-disk/`.
+2. Use notebooks only for quick experiments.
+3. Put working code in `src/`.
 4. Save final plots in `results/plots/`.
 5. Save final test outputs in `results/test_outputs/`.
 6. Write down decisions and failed attempts in `docs/experiment_log.md`.
 
+## Section 4.1 Modelling Checklist
+
+Section 4.1 of the assignment is about modelling the system dynamics.
+
+Required:
+
+- GP model: one model structure is enough, for example NARX or NOE.
+- ANN model: at least one simple model, for example NFIR, NARX, or NOE.
+- ANN model: at least one more advanced learning architecture.
+- Input: applied motor voltage.
+- Output: measured disk angle.
+- Do not use angular velocity for this modelling part.
+- Test the final models on the provided prediction and simulation tasks.
+- Save the final prediction and simulation output files for submission.
+- Explain the model choices, hyperparameters, validation, and limitations.
+
+Current ANN status:
+
+- Done: simple ANN NARX baseline.
+- Done: prediction and simulation output files are generated.
+- Done: held-out validation/test split is used before creating hidden-test outputs.
+- Not done yet: advanced ANN architecture. A simple next option is an RNN/LSTM or a small NOE-style recurrent model.
+
 ## Run The Simple ANN Model
 
-The first ANN model is a small NARX neural network. It expects a CSV file with an input column and an output column.
+The first ANN model is a small NARX neural network.
+
+NARX means the network predicts the next angle from old voltages and old measured angles:
+
+```text
+old voltages + old measured angles -> next measured angle
+```
+
+This follows section 4.1 because it uses only:
+
+- `u`: motor voltage;
+- `th`: measured disk angle.
+
+It does not use angular velocity.
+
+Run the assignment ANN script:
+
+```bash
+python -m src.train_ann_assignment
+```
+
+This uses:
+
+```text
+assignment_files/gym-unbalanced-disk/disc-benchmark-files/training-val-test-data.npz
+```
+
+It creates:
+
+```text
+results/models/ann_narx_assignment_model.pt
+results/test_outputs/ann_hidden_prediction_submission.npz
+results/test_outputs/ann_hidden_simulation_submission.npz
+```
+
+These result files are ignored by Git because they can be regenerated.
+
+Optional settings:
+
+```bash
+python -m src.train_ann_assignment --input-delay 15 --output-delay 15 --hidden-neurons 50 --epochs 1500
+```
+
+The older generic script also exists. It expects a CSV file with an input column and an output column.
 
 Accepted input column names:
 
@@ -80,12 +148,6 @@ Example:
 
 ```bash
 python -m src.train_ann --data data/raw/my_training_data.csv
-```
-
-For the downloaded assignment data, use:
-
-```bash
-python -m src.train_ann_assignment
 ```
 
 ## Group

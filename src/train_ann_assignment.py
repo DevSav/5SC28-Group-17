@@ -44,6 +44,11 @@ def main():
     prediction_file = benchmark_folder / "hidden-test-prediction-submission-file.npz"
     simulation_file = benchmark_folder / "hidden-test-simulation-submission-file.npz"
 
+    required_files = [train_file, prediction_file, simulation_file]
+    for file in required_files:
+        if not file.exists():
+            raise FileNotFoundError("Missing required assignment file: " + str(file))
+
     data = np.load(train_file)
     u = data["u"]
     th = data["th"]
