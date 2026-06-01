@@ -60,28 +60,7 @@ src/
 5. Save final test outputs in `results/test_outputs/`.
 6. Write down decisions and failed attempts in `docs/experiment_log.md`.
 
-## Run The Simple ANN Model
-
-The first ANN model is a small NARX neural network. It expects a CSV file with an input column and an output column.
-
-Accepted input column names:
-
-- `u`
-- `input`
-- `voltage`
-
-Accepted output column names:
-
-- `y`
-- `theta`
-- `angle`
-
-Example:
-
-```bash
-python -m src.train_ann --data data/raw/my_training_data.csv
-```
-
 ## Group
 
 Group 17
+
