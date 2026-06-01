@@ -9,7 +9,7 @@ def make_narx_data(u, y, input_delay=3, output_delay=3):
     """Make delayed inputs for a simple NARX model.
 
     We predict y[k] from old inputs and old measured outputs:
-    [u[k-1], u[k-2], ..., y[k-1], y[k-2], ...] -> y[k]
+    [u[k-3], u[k-2], u[k-1], y[k-3], y[k-2], y[k-1]] -> y[k]
     """
     u = np.asarray(u).reshape(-1)
     y = np.asarray(y).reshape(-1)
@@ -21,10 +21,10 @@ def make_narx_data(u, y, input_delay=3, output_delay=3):
     for k in range(first_index, len(y)):
         row = []
 
-        for delay in range(1, input_delay + 1):
+        for delay in range(input_delay, 0, -1):
             row.append(u[k - delay])
 
-        for delay in range(1, output_delay + 1):
+        for delay in range(output_delay, 0, -1):
             row.append(y[k - delay])
 
         inputs.append(row)
@@ -146,15 +146,15 @@ class ANNModel:
         y_start = list(np.asarray(y_start).reshape(-1))
 
         y_simulated = y_start.copy()
-        first_index = max(input_delay, output_delay)
+        first_index = len(y_start)
 
         for k in range(first_index, len(u)):
             row = []
 
-            for delay in range(1, input_delay + 1):
+            for delay in range(input_delay, 0, -1):
                 row.append(u[k - delay])
 
-            for delay in range(1, output_delay + 1):
+            for delay in range(output_delay, 0, -1):
                 row.append(y_simulated[k - delay])
 
             next_y = self.predict(np.array([row], dtype=np.float32))[0]

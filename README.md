@@ -82,6 +82,12 @@ Example:
 python -m src.train_ann --data data/raw/my_training_data.csv
 ```
 
+For the downloaded assignment data, use:
+
+```bash
+python -m src.train_ann_assignment
+```
+
 ## Group
 
 Group 17
