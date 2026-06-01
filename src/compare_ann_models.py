@@ -3,7 +3,7 @@ import pandas as pd
 import torch
 from matplotlib import pyplot as plt
 
-from src.config import PLOTS_DIR, RAW_DATA_DIR, ROOT
+from src.config import MODELS_DIR, PLOTS_DIR, RAW_DATA_DIR, ROOT, TEST_OUTPUTS_DIR
 from src.models.ann_model import ANNModel, make_narx_data
 from src.models.lstm_ann_model import LSTMANNModel, make_lstm_data
 
@@ -84,6 +84,9 @@ def main():
     torch.manual_seed(0)
 
     benchmark_folder = get_benchmark_folder()
+    prediction_file = benchmark_folder / "hidden-test-prediction-submission-file.npz"
+    simulation_file = benchmark_folder / "hidden-test-simulation-submission-file.npz"
+
     data = np.load(benchmark_folder / "training-val-test-data.npz")
     u = data["u"]
     th = data["th"]
@@ -99,6 +102,8 @@ def main():
     th_test = th[validation_end:]
 
     PLOTS_DIR.mkdir(parents=True, exist_ok=True)
+    MODELS_DIR.mkdir(parents=True, exist_ok=True)
+    TEST_OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
 
     print("Training simple NARX ANN")
     Xtrain, Ytrain = make_narx_data(u_train, th_train, INPUT_DELAY, OUTPUT_DELAY)
@@ -120,12 +125,33 @@ def main():
     Xval_lstm, Yval_lstm = make_lstm_data(u_val, th_val, history=HISTORY)
     Xtest_lstm, Ytest_lstm = make_lstm_data(u_test, th_test, history=HISTORY)
 
-    lstm_model = LSTMANNModel(hidden_size=20)
-    lstm_model.fit(Xtrain_lstm, Ytrain_lstm, Xval_lstm, Yval_lstm, epochs=80)
+    lstm_model = LSTMANNModel(hidden_size=60)
+    lstm_model.fit(Xtrain_lstm, Ytrain_lstm, Xval_lstm, Yval_lstm, epochs=120)
     lstm_prediction = lstm_model.predict(Xtest_lstm)
     lstm_simulation = lstm_model.simulate(
         u_test,
         th_test[:SIMULATION_START_SAMPLES],
+        history=HISTORY,
+    )
+
+    hidden_prediction_data = np.load(prediction_file)
+    upast = hidden_prediction_data["upast"]
+    thpast = hidden_prediction_data["thpast"]
+    hidden_prediction_input = np.stack(
+        [
+            upast[:, 15 - HISTORY :],
+            thpast[:, 15 - HISTORY :],
+        ],
+        axis=2,
+    )
+    thnow = lstm_model.predict(hidden_prediction_input)
+
+    hidden_simulation_data = np.load(simulation_file)
+    u_hidden = hidden_simulation_data["u"]
+    th_hidden = hidden_simulation_data["th"]
+    th_simulated = lstm_model.simulate(
+        u_hidden,
+        th_hidden[:SIMULATION_START_SAMPLES],
         history=HISTORY,
     )
 
@@ -160,6 +186,19 @@ def main():
     )
     comparison.to_csv(PLOTS_DIR / "ann_simulation_comparison.csv", index=False)
 
+    torch.save(lstm_model, MODELS_DIR / "ann_lstm_tuned_assignment_model.pt")
+    np.savez(
+        TEST_OUTPUTS_DIR / "ann_lstm_tuned_hidden_prediction_submission.npz",
+        upast=upast,
+        thpast=thpast,
+        thnow=thnow,
+    )
+    np.savez(
+        TEST_OUTPUTS_DIR / "ann_lstm_tuned_hidden_simulation_submission.npz",
+        u=u_hidden,
+        th=th_simulated,
+    )
+
     plot_prediction(Ytest.reshape(-1), narx_prediction, lstm_prediction)
     plot_simulation(th_test, narx_simulation, lstm_simulation)
     plot_scores(scores)
@@ -169,6 +208,9 @@ def main():
     print("Saved:", PLOTS_DIR / "ann_prediction_comparison.png")
     print("Saved:", PLOTS_DIR / "ann_simulation_comparison.png")
     print("Saved:", PLOTS_DIR / "ann_error_barplot.png")
+    print("Saved:", MODELS_DIR / "ann_lstm_tuned_assignment_model.pt")
+    print("Saved:", TEST_OUTPUTS_DIR / "ann_lstm_tuned_hidden_prediction_submission.npz")
+    print("Saved:", TEST_OUTPUTS_DIR / "ann_lstm_tuned_hidden_simulation_submission.npz")
 
 
 if __name__ == "__main__":

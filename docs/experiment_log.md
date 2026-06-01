@@ -99,3 +99,23 @@ What went well: The plots clearly show that the LSTM is better for both predicti
 What did not work: These are still held-out split results, not official hidden-test scores.
 
 Next step: Use the plots in the report and explain why the recurrent model handles simulation better.
+
+## 2026-06-01 LSTM Tuning
+
+Date: 2026-06-01
+
+Person: Group 17 ANN part
+
+Goal: Improve the advanced ANN model while keeping the old results for comparison.
+
+Method: Tried several LSTM settings and saved all scores in `results/plots/lstm_tuning_results.csv`.
+
+Settings tried: history 10 or 15, hidden size 20, 40, or 60, and 80 or 120 epochs.
+
+Result: Best tuning result was history 15, hidden size 60, 120 epochs. It reached prediction RMSE about 0.218 degrees and simulation RMSE about 1.77 degrees in the tuning run. The regenerated comparison plot run gave prediction RMSE about 0.210 degrees and simulation RMSE about 1.67 degrees.
+
+What went well: The tuned LSTM is close to the benchmark good NN simulation value of 1.55 degrees mentioned in the assignment repository README.
+
+What did not work: Increasing model size does not always improve simulation. The hidden size 40 run had better prediction than smaller models, but worse simulation than the hidden size 60 model.
+
+Next step: Use the tuned LSTM as the final ANN model and use the tuning CSV to support the systematic approach in the report.

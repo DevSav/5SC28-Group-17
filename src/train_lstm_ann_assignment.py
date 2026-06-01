@@ -8,8 +8,8 @@ from src.models.lstm_ann_model import LSTMANNModel, make_lstm_data
 
 
 HISTORY = 15
-HIDDEN_SIZE = 20
-EPOCHS = 80
+HIDDEN_SIZE = 60
+EPOCHS = 120
 SIMULATION_START_SAMPLES = 50
 
 
@@ -26,6 +26,9 @@ def print_score(name, real, predicted):
 
 
 def main():
+    np.random.seed(0)
+    torch.manual_seed(0)
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--history", type=int, default=HISTORY)
     parser.add_argument("--hidden-size", type=int, default=HIDDEN_SIZE)
