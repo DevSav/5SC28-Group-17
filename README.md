@@ -242,6 +242,22 @@ This is useful for the report because it clearly shows why the LSTM is the stron
 
 The tuning CSV keeps the progress so far. It compares several LSTM settings, so we can show that the final model was selected systematically instead of guessed.
 
+To make plots comparing all ANN methods and all LSTM tuning runs, use:
+
+```bash
+python -m src.plot_all_ann_results
+```
+
+This creates:
+
+```text
+results/plots/ann_all_methods_scores.csv
+results/plots/ann_all_methods_barplot.png
+results/plots/ann_lstm_tuning_plot.png
+```
+
+These plots are useful for the report because they show the full path from the simple NARX baseline to the tuned LSTM model.
+
 The older generic script also exists. It expects a CSV file with an input column and an output column.
 
 Accepted input column names:

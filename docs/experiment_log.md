@@ -119,3 +119,21 @@ What went well: The tuned LSTM is close to the benchmark good NN simulation valu
 What did not work: Increasing model size does not always improve simulation. The hidden size 40 run had better prediction than smaller models, but worse simulation than the hidden size 60 model.
 
 Next step: Use the tuned LSTM as the final ANN model and use the tuning CSV to support the systematic approach in the report.
+
+## 2026-06-01 All ANN Method Plots
+
+Date: 2026-06-01
+
+Person: Group 17 ANN part
+
+Goal: Make plots that compare every ANN result, not only the final two models.
+
+Method: Used `results/plots/ann_model_scores.csv` and `results/plots/lstm_tuning_results.csv` to make an all-method bar plot and an LSTM tuning plot.
+
+Result: Saved `ann_all_methods_barplot.png`, `ann_lstm_tuning_plot.png`, and `ann_all_methods_scores.csv` in `results/plots/`.
+
+What went well: The plots show the improvement path clearly: simple NARX is the weakest, and the tuned LSTM with history 15 and hidden size 60 is the strongest.
+
+What did not work: The plots compare held-out split results only, not official hidden-test scores.
+
+Next step: Use these plots in the report to support the systematic approach and model-selection discussion.
