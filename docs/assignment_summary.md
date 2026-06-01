@@ -22,6 +22,18 @@ We need:
 - prediction and simulation tests;
 - clear motivation for all model choices.
 
+Current ANN branch status:
+
+- simple ANN model: NARX feedforward neural network;
+- advanced ANN model: LSTM recurrent neural network;
+- input used: motor voltage `u`;
+- output used: measured angle `th`;
+- angular velocity: not used;
+- validation/test: chronological train, validation, and test split;
+- generated files: hidden prediction and simulation `.npz` output files;
+- provided checker: runs on the generated hidden prediction and simulation files;
+- best current ANN result: LSTM, because it has better held-out prediction and simulation results.
+
 ## Part 2: Swing-Up Policy
 
 This part is 40 percent of the project grade.
@@ -42,4 +54,3 @@ We need one policy that:
 - swings the pendulum from the bottom to the top;
 - tracks a reference around the top position;
 - does not use a switching controller made from separate single-target policies.
-
