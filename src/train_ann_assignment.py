@@ -3,7 +3,7 @@ import argparse
 import numpy as np
 import torch
 
-from src.config import MODELS_DIR, PLOTS_DIR, RAW_DATA_DIR, TEST_OUTPUTS_DIR
+from src.config import MODELS_DIR, PLOTS_DIR, RAW_DATA_DIR, ROOT, TEST_OUTPUTS_DIR
 from src.models.ann_model import ANNModel, make_narx_data
 
 
@@ -35,7 +35,10 @@ def main():
     parser.add_argument("--simulation-start-samples", type=int, default=SIMULATION_START_SAMPLES)
     args = parser.parse_args()
 
-    benchmark_folder = RAW_DATA_DIR / "gym-unbalanced-disk" / "disc-benchmark-files"
+    benchmark_folder = ROOT / "assignment_files" / "gym-unbalanced-disk" / "disc-benchmark-files"
+
+    if not benchmark_folder.exists():
+        benchmark_folder = RAW_DATA_DIR / "gym-unbalanced-disk" / "disc-benchmark-files"
 
     train_file = benchmark_folder / "training-val-test-data.npz"
     prediction_file = benchmark_folder / "hidden-test-prediction-submission-file.npz"
