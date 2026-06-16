@@ -1,0 +1,7 @@
+model_type,na,nb,M,init_method,input_dim,prediction_rmse_rad,prediction_rmse_deg,prediction_nrms_percent,delta_rmse_rad,simulation_rmse_rad,simulation_rmse_deg,simulation_nrms_percent,elapsed_sec,kernel,noise_variance
+gpy_sparse_delta_gp_narx,10,8,250,kmeans,18,0.002859398258402656,0.16383145215353018,0.565949305364962,0.002859398258402656,0.025507913292307633,1.4614957758348799,5.0408046387532295,847.159405708313,"  [1mMat52.     [0;0m  |               value  |  constraints  |  priors
+  [1mvariance   [0;0m  |  0.6737160126954295  |      +ve      |        
+  [1mlengthscale[0;0m  |               (18,)  |      +ve      |        ",0.0005154199506642281
+gpy_sparse_delta_gp_narx,10,8,150,kmeans,18,0.002963535452134495,0.16979807384470075,0.5865607652348839,0.002963535452134495,0.02625426917046646,1.504258817668161,5.188297463025857,474.15407514572144,"  [1mMat52.     [0;0m  |               value  |  constraints  |  priors
+  [1mvariance   [0;0m  |  0.9940042037995447  |      +ve      |        
+  [1mlengthscale[0;0m  |               (18,)  |      +ve      |        ",0.0005711351180108826
