@@ -1,0 +1,16 @@
+{
+    "length": 300,
+    "final_theta": 3.3608837127685547,
+    "final_ref": 3.4033920413889427,
+    "final_error": -0.042508328620388,
+    "min_abs_error": 0.027297223273708315,
+    "mean_abs_error": 0.20422015414104452,
+    "last_window_mean_abs_error": 0.0458606941141624,
+    "last_window_mean_abs_omega": 0.39747015113011,
+    "tracking_ratio": 0.9166666666666666,
+    "sat_ratio": 0.08666666666666667,
+    "max_abs_u": 3.0,
+    "max_abs_omega": 15.584662437438965,
+    "return": 1363.4820218803934,
+    "success": true
+}

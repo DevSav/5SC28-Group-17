@@ -1,0 +1,29 @@
+{
+    "data_info": {
+        "total_samples": 6000,
+        "local_samples": 4926,
+        "local_sample_ratio": 0.821,
+        "local_train_error_bound": 0.6,
+        "switch_threshold": 0.45,
+        "theta_train_min": -3.1110260486602783,
+        "theta_train_max": 3.1123714447021484,
+        "omega_train_min": -7.581850528717041,
+        "omega_train_max": 7.618302345275879,
+        "u_train_min": -3.0,
+        "u_train_max": 3.0,
+        "mean_abs_error_train": 0.05615378073476502
+    },
+    "train_info": {
+        "mse_raw": 0.006697016015904411,
+        "mse_u": 0.017105565403224884,
+        "mae_u": 0.028763204548020897,
+        "max_abs_u_pred": 2.981709675188959,
+        "mean_abs_u_pred": 0.44971633242230724,
+        "n_samples": 4926,
+        "n_params": 226,
+        "n_basis": 225,
+        "ridge_lambda": 0.001,
+        "atanh_clip": 0.95,
+        "omega_scale": 10.0
+    }
+}

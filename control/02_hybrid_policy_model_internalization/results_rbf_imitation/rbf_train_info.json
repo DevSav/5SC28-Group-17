@@ -1,0 +1,16 @@
+{
+    "mse_raw": 0.05705392338045889,
+    "mse_u": 0.1291359906812702,
+    "mae_u": 0.06025262958099654,
+    "max_abs_u_pred": 2.9683065717595367,
+    "mean_abs_u_pred": 0.864310678674444,
+    "n_samples": 6000,
+    "n_params": 226,
+    "n_basis": 225,
+    "ridge_lambda": 0.001,
+    "atanh_clip": 0.95,
+    "omega_scale": 10.0,
+    "mean_weight": 8.13125,
+    "max_weight": 10.0,
+    "min_weight": 0.5
+}

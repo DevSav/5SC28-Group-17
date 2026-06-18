@@ -1,0 +1,26 @@
+{
+    "data_info": {
+        "n_samples": 6561,
+        "error_grid_bound": 0.6,
+        "omega_grid_bound": 8.0,
+        "n_error_grid": 81,
+        "n_omega_grid": 81,
+        "u_min": -3.0,
+        "u_max": 3.0,
+        "mean_abs_u": 2.6296296296296298,
+        "sat_ratio_in_grid": 0.7593354671543971
+    },
+    "train_info": {
+        "mse_raw": 0.01102653252417046,
+        "mse_u": 0.010453419641157851,
+        "mae_u": 0.05714005189554631,
+        "max_abs_u_pred": 2.8971730393104598,
+        "mean_abs_u_pred": 2.5466983002257266,
+        "n_samples": 6561,
+        "n_params": 122,
+        "n_basis": 121,
+        "ridge_lambda": 0.0001,
+        "atanh_clip": 0.95,
+        "omega_scale": 10.0
+    }
+}

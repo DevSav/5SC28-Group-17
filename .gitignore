@@ -4,6 +4,12 @@ __pycache__/
 .venv/
 venv/
 
+# IDE
+.idea/
+
+# Simulink generated cache folders
+slprj/
+
 # Jupyter
 .ipynb_checkpoints/
 
@@ -23,7 +29,9 @@ results/test_outputs/*
 *.pdf
 *.docx
 
+# Original uploaded archives kept locally
+control/99_original_zip/*.zip
+
 # OS files
 .DS_Store
 Thumbs.db
-

@@ -1,0 +1,44 @@
+{
+    "teacher energy + PD": {
+        "length": 300,
+        "final_theta": 3.109672784805298,
+        "final_error": -0.031919868784495264,
+        "min_abs_error": 0.030830057459422022,
+        "mean_abs_error": 0.3453487857342741,
+        "last_window_mean_abs_error": 0.034041796522684964,
+        "max_abs_u": 3.0,
+        "mean_abs_u": 0.8994993612613886,
+        "sat_ratio": 0.18333333333333332,
+        "upright_ratio": 0.8,
+        "max_abs_omega": 21.178611755371094,
+        "final_omega": 0.0009963385527953506
+    },
+    "random RBF": {
+        "length": 300,
+        "final_theta": 0.0017288302769884467,
+        "final_error": -3.1398638233128047,
+        "min_abs_error": 3.136924974741884,
+        "mean_abs_error": 3.1401576282117123,
+        "last_window_mean_abs_error": 3.1394206563424416,
+        "max_abs_u": 0.08495598533518614,
+        "mean_abs_u": 0.08470693366436237,
+        "sat_ratio": 0.0,
+        "upright_ratio": 0.0,
+        "max_abs_omega": 0.0029856781475245953,
+        "final_omega": -0.0005561488796956837
+    },
+    "teacher-initialized RBF": {
+        "length": 300,
+        "final_theta": -104.47834014892578,
+        "final_error": -0.8057825804626084,
+        "min_abs_error": 0.0004969516625941139,
+        "mean_abs_error": 1.4404674544967182,
+        "last_window_mean_abs_error": 1.3246196193638167,
+        "max_abs_u": 3.0,
+        "mean_abs_u": 2.7143881740534526,
+        "sat_ratio": 0.4533333333333333,
+        "upright_ratio": 0.09333333333333334,
+        "max_abs_omega": 23.995712280273438,
+        "final_omega": -18.594247817993164
+    }
+}

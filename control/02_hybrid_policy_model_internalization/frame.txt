@@ -1,0 +1,150 @@
+Stage 0：环境修正与 simulator 接口测试
+
+你已经完成了这一阶段。对应内容包括：
+
+gym_unbalanced_disk/envs/UnbalancedDisk.py
+
+你已经修改了：
+
+def reset(self, seed=None, options=None):
+
+并且 get_obs() 返回 float32。这部分现在不需要继续改，只要 reset() 和 step() 测试都能正常运行即可。
+
+这一阶段的作用是确认：
+
+env.reset()
+env.step(u)
+
+都能正常工作。
+
+Stage 1：baseline swing-up 测试
+
+你现在的文件应该是：
+
+main_simulator_baseline_test.py
+
+它测试了：
+
+zero input
+sinusoidal input
+energy positive sign
+energy negative sign
+energy + PD
+
+这一阶段你也基本完成了。它证明了：
+
+positive energy direction 是正确的
+energy + PD 能完成 swing-up
+official simulator 里任务是可行的
+
+这份代码目前只需要保留，不需要继续作为主实验代码反复修改。
+
+不过注意一点：如果你还没有把 fixed-length array 改成 list 记录，建议改掉。因为之前出现过 Final theta = 0、Last100 err = pi 这类可能由未填充数组造成的问题。你后来的 teacher collection 已经是正确的 list 结构，所以 baseline 文件也最好同步成 list 结构。
+
+Stage 2：teacher data collection
+
+你现在的文件是：
+
+main_collect_teacher_data.py
+
+这一阶段已经完成，而且结果很好：
+
+Average min |error| = 0.0305 rad
+Average upright ratio = 0.8032
+Average saturation ratio = 0.1793
+
+这说明 teacher data 质量足够高。这个文件现在不需要大改，只建议确认保存文件路径稳定：
+
+results_teacher_data/teacher_data_energy_pd.npz
+
+后续所有 imitation / learning 都从这个文件读取数据。
+
+所以目前 Stage 2 也可以固定下来。
+
+Stage 3：RBF policy imitation / behavior cloning
+
+这是你现在下一步最应该写的代码。
+
+建议新建文件：
+
+main_train_rbf_from_teacher.py
+
+它的任务是读取：
+
+results_teacher_data/teacher_data_energy_pd.npz
+
+然后训练一个 RBF policy 去模仿 teacher：
+
+input:  x = [wrap(theta - pi), omega]
+output: u
+
+因为你的 policy 形式是：
+
+u = 3 * tanh(Phi @ params)
+
+所以训练目标应该是：
+
+y = atanh(u_teacher / 3)
+
+然后用 ridge regression 求：
+
+params = inv(Phi.T @ Phi + lambda * I) @ Phi.T @ y
+
+这一阶段要输出：
+
+rbf_teacher_params.npy
+
+并且要测试三条 policy：
+
+teacher energy + PD
+random RBF policy
+teacher-initialized RBF policy
+
+这一步是现在最关键的，因为它会告诉你：RBF policy 结构能不能表达 teacher 的 swing-up 行为。
+
+Stage 4：simulator-based RBF policy optimization
+
+这个阶段要在 Stage 3 成功之后做。
+
+建议新建文件：
+
+main_optimize_rbf_in_simulator.py
+
+它不再使用旧的 GP-NARX model，而是直接在 official simulator 里优化 RBF 参数：
+
+RBF policy → official simulator → rollout cost → optimizer
+
+也就是说，之前你写的 GP internal optimization 逻辑可以复用一部分，但 rollout 函数要换成 simulator rollout：
+
+obs, reward, terminated, truncated, info = env.step(u)
+
+这一阶段的初始参数不要随机生成，而是加载：
+
+rbf_teacher_params.npy
+
+优化目标可以写成：
+
+running cost
++ min error penalty
++ last-window stabilization penalty
++ input penalty
+
+如果 Stage 3 的 imitation 已经很好，这一步主要是微调，让 RBF policy 比 teacher 更平滑、输入饱和更少、稳定性更好。
+
+Stage 5：full-state GP model internalization，可选但更贴近 PILCO
+
+这个阶段可以后面再做，不是现在马上做。
+
+建议新建：
+
+main_train_full_state_gp_model.py
+main_gp_internal_policy_search_full_state.py
+
+它的目标是用 collected data 学一个 full-state dynamics model：
+
+input:  [sin(theta), cos(theta), omega, u]
+output: delta state
+
+而不是继续用旧的 angle-only GP-NARX。
+
+这一阶段更接近 PILCO 的 model learning，但实现复杂度更高。所以现在不要马上做。先完成 Stage 3 和 Stage 4。

@@ -1,0 +1,74 @@
+{
+    "P0": [
+        0.45,
+        1.0,
+        3.0,
+        2.5
+    ],
+    "bounds": [
+        [
+            0.25,
+            0.7
+        ],
+        [
+            0.6,
+            1.4
+        ],
+        [
+            2.0,
+            3.0
+        ],
+        [
+            1.5,
+            3.0
+        ]
+    ],
+    "best_params": [
+        0.5784742877862059,
+        1.3974268312530191,
+        2.7480817820358157,
+        2.330921311766214
+    ],
+    "best_cost": 0.5347744459040387,
+    "metrics": {
+        "initial hybrid policy": {
+            "length": 300,
+            "final_theta": 3.1167914867401123,
+            "final_error": -0.02480116684968081,
+            "min_abs_error": 0.020955236750193507,
+            "mean_abs_error": 0.4281620304101034,
+            "last_window_mean_abs_error": 0.024985855417796046,
+            "last_window_mean_omega_abs": 0.0014142782196722692,
+            "max_abs_u": 3.0,
+            "mean_abs_u": 0.9875653398398265,
+            "sat_ratio": 0.23333333333333334,
+            "upright_ratio": 0.7533333333333333,
+            "max_abs_omega": 21.6655330657959,
+            "final_omega": 0.0020109936594963074,
+            "rbf_mode_ratio": 0.7666666666666667,
+            "energy_mode_ratio": 0.23333333333333334
+        },
+        "optimized hybrid policy": {
+            "length": 300,
+            "final_theta": 3.130127429962158,
+            "final_error": -0.011465223627634913,
+            "min_abs_error": 0.011029156046458155,
+            "mean_abs_error": 0.2962632198046625,
+            "last_window_mean_abs_error": 0.013122990923472315,
+            "last_window_mean_omega_abs": 0.0011560895139882633,
+            "max_abs_u": 2.7480817820358157,
+            "mean_abs_u": 0.6313581201475182,
+            "sat_ratio": 0.0,
+            "upright_ratio": 0.8466666666666667,
+            "max_abs_omega": 21.55828094482422,
+            "final_omega": 0.00040764056029729545,
+            "rbf_mode_ratio": 0.8666666666666667,
+            "energy_mode_ratio": 0.13333333333333333
+        }
+    },
+    "eval_seeds": [
+        100,
+        101,
+        102
+    ]
+}
