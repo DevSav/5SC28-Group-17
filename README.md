@@ -50,7 +50,7 @@ The rubric mainly checks:
   Notes about report files and final submission outputs.
 
 assignment_files/      Required benchmark data, simulator, and checker files.
-src/                   Python source code used by the ANN scripts.
+src/                   Older shared skeleton/helper code.
 results/               Saved models, plots, and submission outputs.
 docs/                  Experiment log and planning notes.
 reports/               Report drafts and final report material.
@@ -132,7 +132,7 @@ It does not use angular velocity.
 Run the assignment ANN script:
 
 ```bash
-python -m src.train_ann_assignment
+python 01_system_dynamics_modeling/ANN/train_ann_assignment.py
 ```
 
 This uses:
@@ -154,7 +154,7 @@ These result files are ignored by Git because they can be regenerated.
 Optional settings:
 
 ```bash
-python -m src.train_ann_assignment --input-delay 15 --output-delay 15 --hidden-neurons 50 --epochs 1500
+python 01_system_dynamics_modeling/ANN/train_ann_assignment.py --input-delay 15 --output-delay 15 --hidden-neurons 50 --epochs 1500
 ```
 
 ## Run The Advanced ANN Model
@@ -170,7 +170,7 @@ The LSTM uses short sequences:
 Run it with:
 
 ```bash
-python -m src.train_lstm_ann_assignment
+python 01_system_dynamics_modeling/ANN/train_lstm_ann_assignment.py
 ```
 
 It creates:
@@ -221,7 +221,7 @@ results/test_outputs/ann_lstm_tuned_hidden_simulation_submission.npz
 To make plots and CSV files comparing the simple NARX ANN with the advanced LSTM ANN, run:
 
 ```bash
-python -m src.compare_ann_models
+python 01_system_dynamics_modeling/ANN/compare_ann_models.py
 ```
 
 This creates:
@@ -256,7 +256,7 @@ The tuning CSV keeps the progress so far. It compares several LSTM settings, so 
 To make plots comparing all ANN methods and all LSTM tuning runs, use:
 
 ```bash
-python -m src.plot_all_ann_results
+python 01_system_dynamics_modeling/ANN/plot_all_ann_results.py
 ```
 
 This creates:
@@ -268,26 +268,6 @@ results/plots/ann_lstm_tuning_plot.png
 ```
 
 These plots are useful for the report because they show the full path from the simple NARX baseline to the tuned LSTM model.
-
-The older generic script also exists. It expects a CSV file with an input column and an output column.
-
-Accepted input column names:
-
-- `u`
-- `input`
-- `voltage`
-
-Accepted output column names:
-
-- `y`
-- `theta`
-- `angle`
-
-Example:
-
-```bash
-python -m src.train_ann --data data/raw/my_training_data.csv
-```
 
 ## Group
 

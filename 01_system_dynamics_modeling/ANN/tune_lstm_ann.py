@@ -2,8 +2,8 @@ import numpy as np
 import pandas as pd
 import torch
 
-from src.config import PLOTS_DIR, RAW_DATA_DIR, ROOT
-from src.models.lstm_ann_model import LSTMANNModel, make_lstm_data
+from config import PLOTS_DIR, RAW_DATA_DIR, ROOT
+from models.lstm_ann_model import LSTMANNModel, make_lstm_data
 
 
 SIMULATION_START_SAMPLES = 50

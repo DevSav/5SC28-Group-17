@@ -12,12 +12,10 @@ For this modelling part we do not use angular velocity.
 
 ```text
 ANN/
-  Short guide to the ANN files and results.
+  ANN model code, training scripts, comparison scripts, and README.
 
 GP/
   Gaussian Process work from the GP teammate.
 ```
-
-The ANN code itself stays in `../src/` because it is a Python package and the training commands already work from there.
 
 The ANN and GP results can be compared in the report as two different ways to model the same system.

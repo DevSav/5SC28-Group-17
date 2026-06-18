@@ -1,7 +1,7 @@
 import pandas as pd
 from matplotlib import pyplot as plt
 
-from src.config import PLOTS_DIR
+from config import PLOTS_DIR
 
 
 def add_labels(bars):

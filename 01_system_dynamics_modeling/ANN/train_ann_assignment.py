@@ -3,8 +3,8 @@ import argparse
 import numpy as np
 import torch
 
-from src.config import MODELS_DIR, PLOTS_DIR, RAW_DATA_DIR, ROOT, TEST_OUTPUTS_DIR
-from src.models.ann_model import ANNModel, make_narx_data
+from config import MODELS_DIR, PLOTS_DIR, RAW_DATA_DIR, ROOT, TEST_OUTPUTS_DIR
+from models.ann_model import ANNModel, make_narx_data
 
 
 INPUT_DELAY = 15

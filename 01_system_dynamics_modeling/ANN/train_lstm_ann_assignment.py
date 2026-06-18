@@ -3,8 +3,8 @@ import argparse
 import numpy as np
 import torch
 
-from src.config import MODELS_DIR, RAW_DATA_DIR, ROOT, TEST_OUTPUTS_DIR
-from src.models.lstm_ann_model import LSTMANNModel, make_lstm_data
+from config import MODELS_DIR, RAW_DATA_DIR, ROOT, TEST_OUTPUTS_DIR
+from models.lstm_ann_model import LSTMANNModel, make_lstm_data
 
 
 HISTORY = 15

@@ -3,9 +3,9 @@ import pandas as pd
 import torch
 from matplotlib import pyplot as plt
 
-from src.config import MODELS_DIR, PLOTS_DIR, RAW_DATA_DIR, ROOT, TEST_OUTPUTS_DIR
-from src.models.ann_model import ANNModel, make_narx_data
-from src.models.lstm_ann_model import LSTMANNModel, make_lstm_data
+from config import MODELS_DIR, PLOTS_DIR, RAW_DATA_DIR, ROOT, TEST_OUTPUTS_DIR
+from models.ann_model import ANNModel, make_narx_data
+from models.lstm_ann_model import LSTMANNModel, make_lstm_data
 
 
 INPUT_DELAY = 15
