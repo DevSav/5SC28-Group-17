@@ -13,17 +13,13 @@ slprj/
 # Jupyter
 .ipynb_checkpoints/
 
-# Local data and results can become large
+# Local data can become large
 data/raw/*
 data/processed/*
-results/models/*
-results/test_outputs/*
 
 # Keep folder placeholders
 !data/raw/.gitkeep
 !data/processed/.gitkeep
-!results/models/.gitkeep
-!results/test_outputs/.gitkeep
 
 # Course files kept locally, not pushed
 *.pdf

@@ -13,7 +13,7 @@ Report drafts and written material should go in:
 Useful plots are mainly in:
 
 ```text
-../results/plots/
+../01_system_dynamics_modeling/ANN/results/plots/
 ```
 
 The experiment log is:
@@ -27,7 +27,7 @@ The experiment log is:
 ANN hidden-test output files are generated in:
 
 ```text
-../results/test_outputs/
+../01_system_dynamics_modeling/ANN/results/test_outputs/
 ```
 
 GP hidden-test output files are in:

@@ -61,13 +61,13 @@ python 01_system_dynamics_modeling/ANN/compare_ann_models.py
 This trains/compares the simple and advanced ANN models and creates plots in:
 
 ```text
-results/plots/
+01_system_dynamics_modeling/ANN/results/plots/
 ```
 
 The final generated ANN submission files are saved in:
 
 ```text
-results/test_outputs/
+01_system_dynamics_modeling/ANN/results/test_outputs/
 ```
 
 These output files are ignored by Git because they can be regenerated.
