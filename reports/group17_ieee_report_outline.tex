@@ -1,0 +1,337 @@
+\documentclass[conference]{IEEEtran}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{cite}
+
+\title{Machine Learning for Control of an Unbalanced Disk\\
+Group 17 Design Project}
+
+\author{
+\IEEEauthorblockN{Group 17}
+\IEEEauthorblockA{5SC28 Machine Learning for Systems and Control\\
+Eindhoven University of Technology}
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This report studies model learning and policy learning for the unbalanced disk system.
+The system input is the motor voltage and the measured output is the disk angle.
+First, Gaussian Process and Artificial Neural Network models are identified from data.
+Then, reinforcement learning controllers are used for swing-up and reference tracking.
+The final results compare prediction, simulation, and control performance.
+\end{abstract}
+
+\begin{IEEEkeywords}
+system identification, Gaussian Process, artificial neural network, LSTM, reinforcement learning, Q-learning, unbalanced disk
+\end{IEEEkeywords}
+
+\section{Report Requirements Checklist}
+
+This section should be removed or shortened in the final report, but it is useful while writing.
+
+\begin{itemize}
+    \item The report should clearly explain the final solution and the systematic approach.
+    \item The report should connect the work to course theory.
+    \item The report should critically discuss results, limitations, and possible improvements.
+    \item The modelling part is 50 percent of the project grade: 25 percent ANN and 25 percent GP.
+    \item The policy learning part is 40 percent of the project grade: 20 percent Q-learning and 20 percent actor-critic or model internalization.
+    \item Reference tracking is the remaining project objective: one policy should swing up and track a reference near the upright position.
+    \item For modelling, use motor voltage as input and measured disk angle as output.
+    \item Do not use angular velocity for the modelling task.
+    \item For ANN modelling, include one simple model and one advanced architecture.
+    \item For GP modelling, one model structure is enough, but it must be analysed clearly.
+    \item Models must be tested on both prediction and simulation tasks.
+    \item Final test outputs must be shared with the lecturers.
+    \item The rubric checks quality and quantity of results, design choices, theory discussion, report clarity, presentation clarity, and individual contribution.
+    \item Each student also needs an individual reflection with own contribution, team contribution, and a contribution ranking table.
+\end{itemize}
+
+\section{Introduction}
+
+\subsection{Problem Description}
+
+Briefly describe the unbalanced disk setup.
+The goal is to learn models and controllers for the disk using machine learning methods from the course.
+
+\subsection{Project Objectives}
+
+The project is divided into three main parts:
+
+\begin{enumerate}
+    \item Learn system dynamics models using GP and ANN.
+    \item Learn a swing-up policy.
+    \item Extend the controller to reference tracking near the upright position.
+\end{enumerate}
+
+\subsection{Group Work Division}
+
+Group 17 divided the work as follows:
+
+\begin{itemize}
+    \item ANN modelling: TODO add name.
+    \item GP modelling: TODO add name.
+    \item Control and simulation: TODO add name.
+    \item Real setup testing: TODO add names after tomorrow's experiments.
+\end{itemize}
+
+\section{System Description and Data}
+
+\subsection{Unbalanced Disk System}
+
+Explain the physical system in simple terms.
+The motor applies a voltage input $u(k)$ and the sensor measures the disk angle $\theta(k)$.
+
+\subsection{Available Data}
+
+Describe the training, validation, test, and hidden test data files.
+Mention that the hidden test files are used only to generate final submission outputs.
+
+\subsection{Prediction and Simulation Tasks}
+
+Explain the difference:
+
+\begin{itemize}
+    \item Prediction: use past measured values to predict the next angle.
+    \item Simulation: predict a full trajectory using the model's own previous predictions.
+\end{itemize}
+
+\section{System Dynamics Modelling}
+
+\subsection{Identification Approach}
+
+Explain the system identification cycle from the course:
+choose model structure, train model, validate model, tune hyperparameters, test final model, and discuss limitations.
+
+\subsection{Gaussian Process Model}
+
+TODO: Add GP model description from the GP folder.
+
+Include:
+
+\begin{itemize}
+    \item chosen model structure;
+    \item chosen kernel;
+    \item hyperparameters;
+    \item sparse GP or other approximation if used;
+    \item prediction and simulation results;
+    \item strengths and weaknesses.
+\end{itemize}
+
+\subsection{Artificial Neural Network Models}
+
+\subsubsection{Simple NARX ANN}
+
+Explain that the simple ANN uses delayed voltages and delayed measured angles:
+
+\begin{equation}
+\hat{\theta}(k) = f(u(k-1), \ldots, u(k-n_u), \theta(k-1), \ldots, \theta(k-n_y)).
+\end{equation}
+
+Mention that this follows the practical session style and does not use angular velocity.
+
+\subsubsection{Advanced LSTM ANN}
+
+Explain that the LSTM receives a short sequence of voltage and angle values.
+The LSTM is recurrent, so it can learn time dependencies more naturally than the simple feedforward ANN.
+
+\subsubsection{ANN Training and Tuning}
+
+Describe:
+
+\begin{itemize}
+    \item train/validation/test split;
+    \item normalization;
+    \item optimizer;
+    \item number of delayed samples or history length;
+    \item hidden neurons or hidden size;
+    \item early stopping or selected epoch count;
+    \item tuning table.
+\end{itemize}
+
+\subsection{Modelling Results}
+
+\begin{table}[h]
+\centering
+\caption{Model validation results.}
+\begin{tabular}{lcc}
+\toprule
+Model & Prediction RMSE & Simulation RMSE \\
+\midrule
+Simple NARX ANN & TODO & TODO \\
+Advanced LSTM ANN & TODO & TODO \\
+Gaussian Process & TODO & TODO \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Add figures:
+
+\begin{itemize}
+    \item ANN prediction comparison plot.
+    \item ANN simulation comparison plot.
+    \item GP validation plot.
+    \item Error bar plot comparing models.
+\end{itemize}
+
+\section{Policy Learning}
+
+\subsection{Swing-Up Objective}
+
+Explain that the controller must move the disk from the stable bottom position to the unstable upright position and keep it there.
+
+\subsection{Q-Learning Controller}
+
+TODO: Add controller teammate's Q-learning method.
+
+Include:
+
+\begin{itemize}
+    \item state definition;
+    \item action definition;
+    \item reward function;
+    \item exploration method;
+    \item training episodes;
+    \item simulation results.
+\end{itemize}
+
+\subsection{Actor-Critic or Model Internalization Controller}
+
+TODO: Add hybrid/model internalization method.
+
+Include:
+
+\begin{itemize}
+    \item policy structure;
+    \item learned or internal model;
+    \item training/tuning choices;
+    \item robustness tests;
+    \item comparison with Q-learning.
+\end{itemize}
+
+\section{Reference Tracking}
+
+\subsection{Objective}
+
+Explain that the final controller should both swing up and track a reference around the upright position.
+
+\subsection{Method}
+
+TODO: Add the reference tracking controller details.
+
+\subsection{Simulation Results}
+
+Add plots and metrics from the reference tracking results folder.
+
+\section{Real Setup Test Plan and Results}
+
+This section is intentionally left with room for tomorrow's experiments.
+
+\subsection{Test Plan}
+
+Before running on the real setup, record:
+
+\begin{itemize}
+    \item date and location of experiment;
+    \item controller version used;
+    \item safety checks;
+    \item starting position;
+    \item number of trials;
+    \item success definition;
+    \item what data was logged.
+\end{itemize}
+
+\subsection{Real Setup Results}
+
+TODO after tomorrow:
+
+\begin{itemize}
+    \item add trial table;
+    \item add measured angle plot;
+    \item add motor voltage plot;
+    \item add success/failure discussion;
+    \item compare real setup performance with simulation performance.
+\end{itemize}
+
+\begin{table}[h]
+\centering
+\caption{Real setup test results.}
+\begin{tabular}{lccc}
+\toprule
+Trial & Controller & Success & Notes \\
+\midrule
+1 & TODO & TODO & TODO \\
+2 & TODO & TODO & TODO \\
+3 & TODO & TODO & TODO \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Discussion}
+
+\subsection{Comparison Between Models}
+
+Discuss GP vs ANN:
+
+\begin{itemize}
+    \item prediction performance;
+    \item simulation performance;
+    \item interpretability;
+    \item training complexity;
+    \item sensitivity to hyperparameters.
+\end{itemize}
+
+\subsection{Comparison Between Controllers}
+
+Discuss Q-learning, hybrid/model internalization, and reference tracking.
+
+\subsection{Limitations}
+
+Mention:
+
+\begin{itemize}
+    \item noisy measurement data;
+    \item simulation-to-real difference;
+    \item limited real setup time;
+    \item hidden test score unknown until evaluated by lecturers;
+    \item possible overfitting in neural network tuning.
+\end{itemize}
+
+\section{Conclusion}
+
+Summarize:
+
+\begin{itemize}
+    \item best modelling result;
+    \item best control result;
+    \item whether real setup tests were successful;
+    \item main lesson learned from the project.
+\end{itemize}
+
+\section*{Individual Contributions}
+
+The final report can include a short summary here, but the official individual reflection should also be filled in using the provided reflection template.
+
+\begin{itemize}
+    \item TODO: Student 1 contribution.
+    \item TODO: Student 2 contribution.
+    \item TODO: Student 3 contribution.
+    \item TODO: Student 4 contribution, if applicable.
+\end{itemize}
+
+\bibliographystyle{IEEEtran}
+\begin{thebibliography}{1}
+
+\bibitem{course}
+5SC28 Machine Learning for Systems and Control lecture and practical material.
+
+\bibitem{assignment}
+5SC28 Design Assignment, Eindhoven University of Technology, 2026.
+
+\end{thebibliography}
+
+\end{document}
