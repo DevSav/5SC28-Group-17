@@ -39,8 +39,9 @@ def plot_all_errors(data):
     add_labels(simulation_bars)
 
     plt.xticks(x, data["model"], rotation=25, ha="right")
+    plt.yscale("log")
     plt.ylabel("RMSE (degrees)")
-    plt.title("All ANN model results")
+    plt.title("All ANN model results (log scale)")
     plt.legend()
     plt.tight_layout()
     plt.savefig(PLOTS_DIR / "ann_all_methods_barplot.png", dpi=150)
@@ -80,6 +81,26 @@ def main():
             "simulation_rmse_deg": simple_row["simulation_rmse_deg"],
         }
     )
+
+    if "advanced GRU ANN" in simple_and_best["model"].values:
+        gru_row = simple_and_best[simple_and_best["model"] == "advanced GRU ANN"].iloc[0]
+        rows.append(
+            {
+                "model": "advanced GRU ANN",
+                "prediction_rmse_deg": gru_row["prediction_rmse_deg"],
+                "simulation_rmse_deg": gru_row["simulation_rmse_deg"],
+            }
+        )
+
+    if "advanced LSTM ANN" in simple_and_best["model"].values:
+        lstm_row = simple_and_best[simple_and_best["model"] == "advanced LSTM ANN"].iloc[0]
+        rows.append(
+            {
+                "model": "advanced LSTM ANN",
+                "prediction_rmse_deg": lstm_row["prediction_rmse_deg"],
+                "simulation_rmse_deg": lstm_row["simulation_rmse_deg"],
+            }
+        )
 
     for _, row in tuning_data.iterrows():
         rows.append(

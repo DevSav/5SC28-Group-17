@@ -1,17 +1,24 @@
 \documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
 
-\usepackage{amsmath}
-\usepackage{graphicx}
-\usepackage{booktabs}
 \usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{url}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
-\title{Machine Learning for Control of an Unbalanced Disk\\
+\title{Machine Learning for Modelling and Control of an Unbalanced Disk\\
 Group 17 Design Project}
 
-\author{
-\IEEEauthorblockN{Group 17}
-\IEEEauthorblockA{5SC28 Machine Learning for Systems and Control\\
-Eindhoven University of Technology}
+\author{\IEEEauthorblockN{TODO Student 1 Name, TODO Student 2 Name, TODO Student 3 Name}
+\IEEEauthorblockA{\textit{5SC28 Machine Learning for Systems and Control}\\
+\textit{Eindhoven University of Technology}\\
+TODO student numbers}
 }
 
 \begin{document}
@@ -19,260 +26,440 @@ Eindhoven University of Technology}
 \maketitle
 
 \begin{abstract}
-This report studies model learning and policy learning for the unbalanced disk system.
-The system input is the motor voltage and the measured output is the disk angle.
-First, Gaussian Process and Artificial Neural Network models are identified from data.
-Then, reinforcement learning controllers are used for swing-up and reference tracking.
-The final results compare prediction, simulation, and control performance.
+% Target length: 120--180 words.
+% Write this last.
+This report presents the Group 17 design project on machine learning for modelling and control of an unbalanced disk.
+The modelling part identifies the system dynamics from measured data, where the input is the applied motor voltage and the output is the measured disk angle.
+Both Gaussian Process and Artificial Neural Network models are developed and evaluated on prediction and simulation tasks.
+The control part studies reinforcement learning policies for swing-up and reference tracking.
+The methods are compared using validation errors, hidden-test output files, simulation performance, and, if available, real setup experiments.
 \end{abstract}
 
 \begin{IEEEkeywords}
-system identification, Gaussian Process, artificial neural network, LSTM, reinforcement learning, Q-learning, unbalanced disk
+unbalanced disk, system identification, Gaussian Process, Artificial Neural Network, LSTM, Q-learning, model internalization, reference tracking
 \end{IEEEkeywords}
 
-\section{Report Requirements Checklist}
-
-This section should be removed or shortened in the final report, but it is useful while writing.
-
-\begin{itemize}
-    \item The report should clearly explain the final solution and the systematic approach.
-    \item The group report must be a PDF in 2-column IEEE format.
-    \item The report length must be 6--12 pages.
-    \item The report must include names and student numbers.
-    \item The report should connect the work to course theory.
-    \item The report should critically discuss results, limitations, and possible improvements.
-    \item The modelling part is 50 percent of the project grade: 25 percent ANN and 25 percent GP.
-    \item The policy learning part is 40 percent of the project grade: 20 percent Q-learning and 20 percent actor-critic or model internalization.
-    \item Reference tracking is the remaining project objective: one policy should swing up and track a reference near the upright position.
-    \item For modelling, use motor voltage as input and measured disk angle as output.
-    \item Do not use angular velocity for the modelling task.
-    \item For ANN modelling, include one simple model and one advanced architecture.
-    \item For GP modelling, one model structure is enough, but it must be analysed clearly.
-    \item Models must be tested on both prediction and simulation tasks.
-    \item Final test outputs must be shared with the lecturers.
-    \item The group submission must be one zip file containing one report PDF and two folders.
-    \item One folder must contain requested prediction and simulation test files.
-    \item The test-file folder must contain at least one ANN prediction file, one ANN simulation file, one GP prediction file, and one GP simulation file.
-    \item The other folder must contain the relevant project code and possible additional material.
-    \item The group assessment starts with a 10-minute group presentation followed by group discussion and Q\&A.
-    \item Every group member should be able to answer questions about all parts of the assignment and course theory.
-    \item The rubric checks quality and quantity of results, design choices, theory discussion, report clarity, presentation clarity, and individual contribution.
-    \item Each student also needs an individual reflection report of maximum 500 words.
-    \item The individual reflection should include own contribution, team contribution, and a contribution ranking table.
-\end{itemize}
+% =========================================================
+% WRITING PLAN
+% =========================================================
+% Required report format from announcement:
+% - PDF.
+% - IEEE 2-column conference format using IEEEtran.
+% - 6--12 pages.
+% - Include all names and student numbers in the author block.
+% - Remove all writing-plan comments before final PDF export.
+% - IEEE style reminders: define abbreviations the first time they appear,
+%   cite figures after they are mentioned, place figure captions below figures,
+%   place table captions above tables, and use SI units.
+%
+% Group zip must include:
+% - 1 report PDF.
+% - 1 folder with requested prediction/simulation files.
+% - 1 folder with relevant code and additional material.
+%
+% Requested test files:
+% - at least one ANN prediction result.
+% - at least one ANN simulation result.
+% - at least one GP prediction result.
+% - at least one GP simulation result.
+%
+% Max-grade strategy:
+% - Do not only show final plots. Explain choices, tuning, failures, and limitations.
+% - For every method, include: theory link, implementation choice, validation method, final result, critical discussion.
+% - Make prediction vs simulation clear. The lecturers care about this.
+% - Mention that angular velocity was not used in the modelling part.
+% - Leave real setup results honest: if not tested, say so; if tested, compare with simulation.
 
 \section{Introduction}
+% Page budget: about 0.5 page.
+% Max-grade purpose: clearly introduce the problem and show that the report follows the assignment objectives.
 
-\subsection{Problem Description}
+\subsection{Motivation and Problem}
+The unbalanced disk is a nonlinear dynamical system.
+The project goal is to use machine learning methods from the course to model the system dynamics and to learn controllers for swing-up and reference tracking.
 
-Briefly describe the unbalanced disk setup.
-The goal is to learn models and controllers for the disk using machine learning methods from the course.
-
-\subsection{Project Objectives}
-
-The project is divided into three main parts:
-
-\begin{enumerate}
-    \item Learn system dynamics models using GP and ANN.
-    \item Learn a swing-up policy.
-    \item Extend the controller to reference tracking near the upright position.
-\end{enumerate}
-
-\subsection{Group Work Division}
-
-Group 17 divided the work as follows:
-
+Write:
 \begin{itemize}
-    \item ANN modelling: TODO add name.
-    \item GP modelling: TODO add name.
-    \item Control and simulation: TODO add name.
-    \item Real setup testing: TODO add names after tomorrow's experiments.
+    \item what the unbalanced disk is;
+    \item why it is a useful control benchmark;
+    \item why nonlinear modelling and reinforcement learning are relevant;
+    \item what ``successful'' modelling and control mean in this project.
 \end{itemize}
 
-\section{System Description and Data}
+\subsection{Assignment Objectives}
+The assignment is split into three main objectives:
+\begin{enumerate}
+    \item identify the system dynamics using GP and ANN models;
+    \item learn a swing-up policy;
+    \item extend the policy to reference tracking around the upright position.
+\end{enumerate}
 
-\subsection{Unbalanced Disk System}
+State the exact modelling variables:
+\begin{equation}
+u(k) = \text{applied motor voltage}, \qquad
+\theta(k) = \text{measured disk angle}.
+\end{equation}
 
-Explain the physical system in simple terms.
-The motor applies a voltage input $u(k)$ and the sensor measures the disk angle $\theta(k)$.
+Important sentence to include:
+For the modelling task, angular velocity was not used, following the assignment requirement.
 
-\subsection{Available Data}
-
-Describe the training, validation, test, and hidden test data files.
-Mention that the hidden test files are used only to generate final submission outputs.
-
-\subsection{Prediction and Simulation Tasks}
-
-Explain the difference:
+\subsection{Group 17 Contributions}
+% Keep this short in the group report.
+% The individual reflection is submitted separately and has max 500 words.
 
 \begin{itemize}
-    \item Prediction: use past measured values to predict the next angle.
-    \item Simulation: predict a full trajectory using the model's own previous predictions.
+    \item ANN modelling: TODO name and one-sentence contribution.
+    \item GP modelling: TODO name and one-sentence contribution.
+    \item Control/simulation: TODO name and one-sentence contribution.
+    \item Real setup test, if performed: TODO names and date.
+\end{itemize}
+
+\section{System, Data, and Evaluation Tasks}
+% Page budget: about 0.75--1 page.
+% Max-grade purpose: make the experimental setup and evaluation rules unambiguous.
+
+\subsection{System Description}
+Describe the measured disk angle, the motor voltage, the sampling of the data, and the goal of reaching the upright position.
+Mention that the output is noisy.
+
+Suggested figure:
+\begin{itemize}
+    \item Figure 1: photo or schematic of the unbalanced disk setup.
+\end{itemize}
+
+\subsection{Available Data}
+Describe:
+\begin{itemize}
+    \item training/validation/test data from the provided files;
+    \item hidden prediction test file;
+    \item hidden simulation test file;
+    \item how the group split the known data for validation before generating hidden-test outputs.
+\end{itemize}
+
+\subsection{Prediction Versus Simulation}
+This part is important for theory discussion.
+
+Prediction uses measured past outputs:
+\begin{equation}
+\hat{\theta}(k) = f(u(k-1), \ldots, \theta(k-1), \ldots).
+\end{equation}
+
+Simulation feeds the model's own previous predicted outputs back into the model.
+This is harder because errors can accumulate over time.
+
+State clearly:
+\begin{itemize}
+    \item prediction tests one-step-ahead accuracy;
+    \item simulation tests long-term dynamical consistency;
+    \item both are required by the assignment.
+\end{itemize}
+
+\subsection{Evaluation Metrics}
+Use RMSE in radians and degrees:
+\begin{equation}
+\mathrm{RMSE} =
+\sqrt{\frac{1}{N}\sum_{k=1}^{N}(\theta(k)-\hat{\theta}(k))^2}.
+\end{equation}
+
+Mention any extra control metrics:
+\begin{itemize}
+    \item success rate;
+    \item mean absolute tracking error;
+    \item percentage of time near upright/reference;
+    \item control voltage behaviour.
 \end{itemize}
 
 \section{System Dynamics Modelling}
+% Page budget: about 2--3 pages.
+% Max-grade purpose: cover both GP and ANN theory, design choices, tuning, and final results.
 
-\subsection{Identification Approach}
+\subsection{System Identification Approach}
+Connect to Lecture 1 and the standard system-identification cycle \cite{course5sc28,ljung1999system}:
+\begin{itemize}
+    \item choose a model structure;
+    \item estimate parameters or train the model;
+    \item validate using unseen data;
+    \item tune hyperparameters;
+    \item compare prediction and simulation;
+    \item discuss limitations and uncertainty.
+\end{itemize}
 
-Explain the system identification cycle from the course:
-choose model structure, train model, validate model, tune hyperparameters, test final model, and discuss limitations.
+Explain why nonlinear models are needed for the unbalanced disk.
 
 \subsection{Gaussian Process Model}
+% Fill this using the GP teammate's folder.
+% Max-grade purpose: do not only report the score. Explain why the GP model makes sense.
 
-TODO: Add GP model description from the GP folder.
+\subsubsection{Model Structure}
+TODO describe the GP input-output structure.
+For example, if GP-NARX is used:
+\begin{equation}
+\hat{\theta}(k) =
+f(u(k-1), \ldots, u(k-n_u), \theta(k-1), \ldots, \theta(k-n_y)).
+\end{equation}
 
-Include:
-
+Mention:
 \begin{itemize}
-    \item chosen model structure;
-    \item chosen kernel;
-    \item hyperparameters;
-    \item sparse GP or other approximation if used;
-    \item prediction and simulation results;
-    \item strengths and weaknesses.
+    \item delays used;
+    \item whether the model predicts angle directly or a difference/residual;
+    \item whether sparse GP is used.
+\end{itemize}
+
+\subsubsection{Kernel and Hyperparameters}
+Explain the theory using the GP lecture material and a standard GP reference \cite{course5sc28,rasmussen2006gpml}:
+\begin{itemize}
+    \item GP defines a distribution over functions;
+    \item mean function and covariance/kernel;
+    \item kernel choice controls smoothness and similarity;
+    \item hyperparameters are learned/tuned from data;
+    \item sparse GP reduces computational cost if used.
+\end{itemize}
+
+\subsubsection{GP Results}
+Add:
+\begin{itemize}
+    \item prediction RMSE;
+    \item simulation RMSE;
+    \item final hidden-test files generated;
+    \item plot of validation simulation;
+    \item short discussion of uncertainty/limitations.
 \end{itemize}
 
 \subsection{Artificial Neural Network Models}
+% This is your ANN part. It should be detailed enough to defend.
 
-\subsubsection{Simple NARX ANN}
-
-Explain that the simple ANN uses delayed voltages and delayed measured angles:
-
+\subsubsection{Simple ANN: NARX Feedforward Network}
+The simple ANN uses delayed voltages and delayed measured angles.
+Neural networks are a standard tool for nonlinear dynamical-system identification \cite{narendra1990identification}.
 \begin{equation}
-\hat{\theta}(k) = f(u(k-1), \ldots, u(k-n_u), \theta(k-1), \ldots, \theta(k-n_y)).
+\hat{\theta}(k) =
+f_{\mathrm{ANN}}(u(k-1), \ldots, u(k-n_u),
+\theta(k-1), \ldots, \theta(k-n_y)).
 \end{equation}
 
-Mention that this follows the practical session style and does not use angular velocity.
-
-\subsubsection{Advanced LSTM ANN}
-
-Explain that the LSTM receives a short sequence of voltage and angle values.
-The LSTM is recurrent, so it can learn time dependencies more naturally than the simple feedforward ANN.
-
-\subsubsection{ANN Training and Tuning}
-
-Describe:
-
+Write:
 \begin{itemize}
-    \item train/validation/test split;
-    \item normalization;
-    \item optimizer;
-    \item number of delayed samples or history length;
-    \item hidden neurons or hidden size;
-    \item early stopping or selected epoch count;
-    \item tuning table.
+    \item this is the simple model required by section 4.1;
+    \item it follows the NARX idea from the practical sessions;
+    \item it uses only motor voltage and disk angle;
+    \item it is easy to train but has limited memory because delays are fixed manually.
 \end{itemize}
 
-\subsection{Modelling Results}
+Theory to mention:
+\begin{itemize}
+    \item feedforward neural networks approximate nonlinear functions;
+    \item training uses backpropagation;
+    \item overfitting is controlled by validation/early stopping or selected epochs.
+\end{itemize}
+
+\subsubsection{Advanced ANN: GRU and LSTM Recurrent Networks}
+The advanced ANN models use a short sequence.
+GRU and LSTM networks are recurrent neural networks designed to learn sequence dependencies.
+GRU is a simpler gated recurrent model \cite{cho2014gru}, while LSTM was designed to reduce the vanishing-gradient problem \cite{hochreiter1997lstm}.
+\begin{equation}
+[(u(k-H),\theta(k-H)), \ldots, (u(k-1),\theta(k-1))]
+\rightarrow \hat{\theta}(k).
+\end{equation}
+
+Write:
+\begin{itemize}
+    \item GRU and LSTM are the advanced ANN architectures used for section 4.1;
+    \item recurrent networks are suitable for time series;
+    \item gated recurrent networks help with sequence dependencies and vanishing gradients;
+    \item it still does not use angular velocity.
+\end{itemize}
+
+\subsubsection{Training, Validation, and Tuning}
+Include exact settings:
+\begin{itemize}
+    \item training/validation/test split;
+    \item normalization method;
+    \item optimizer and learning rate;
+    \item input delay/output delay for NARX;
+    \item history length and hidden size for GRU/LSTM;
+    \item number of epochs;
+    \item tuning settings tried.
+\end{itemize}
+
+Suggested table:
+\begin{table}[h]
+\centering
+\caption{ANN hyperparameter settings.}
+\begin{tabular}{lccc}
+\toprule
+Model & Memory & Hidden size & Epochs \\
+\midrule
+NARX ANN & TODO & TODO & TODO \\
+GRU ANN & TODO & TODO & TODO \\
+LSTM ANN & TODO & TODO & TODO \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Modelling Results and Comparison}
+% Max-grade purpose: compare all models and explain why the final selected files were chosen.
 
 \begin{table}[h]
 \centering
-\caption{Model validation results.}
+\caption{Validation results for system dynamics models.}
 \begin{tabular}{lcc}
 \toprule
 Model & Prediction RMSE & Simulation RMSE \\
 \midrule
 Simple NARX ANN & TODO & TODO \\
+Advanced GRU ANN & TODO & TODO \\
 Advanced LSTM ANN & TODO & TODO \\
 Gaussian Process & TODO & TODO \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Add figures:
-
+Figures to include:
 \begin{itemize}
-    \item ANN prediction comparison plot.
-    \item ANN simulation comparison plot.
-    \item GP validation plot.
-    \item Error bar plot comparing models.
+    \item prediction comparison plot;
+    \item simulation comparison plot;
+    \item ANN tuning plot;
+    \item GP simulation plot;
+    \item error bar plot comparing ANN and GP.
 \end{itemize}
 
-\section{Policy Learning}
-
-\subsection{Swing-Up Objective}
-
-Explain that the controller must move the disk from the stable bottom position to the unstable upright position and keep it there.
-
-\subsection{Q-Learning Controller}
-
-TODO: Add controller teammate's Q-learning method.
-
-Include:
-
+Discussion points:
 \begin{itemize}
-    \item state definition;
-    \item action definition;
+    \item which model is best for prediction;
+    \item which model is best for simulation;
+    \item why simulation errors are usually larger;
+    \item whether the advanced ANN improved over the simple ANN;
+    \item whether the GP has advantages in uncertainty or data efficiency;
+    \item final files selected for submission.
+\end{itemize}
+
+\section{Policy Learning for Swing-Up}
+% Page budget: about 1.5--2 pages.
+% Max-grade purpose: show RL theory, reward design, training design, and actual performance.
+
+\subsection{Control Objective}
+The policy should move the disk from the stable bottom position to the upright position and keep it there.
+Use reinforcement-learning theory from the course and Sutton and Barto \cite{course5sc28,sutton2018reinforcement}.
+Mention constraints such as voltage limits and the nonlinear nature of the task.
+
+\subsection{Q-Learning / DQN Method}
+TODO fill using the control folder.
+
+Theory to include:
+\begin{itemize}
+    \item Markov decision process: state, action, reward, transition;
+    \item value function or Q-function;
+    \item exploration versus exploitation;
+    \item why DQN is useful for high-dimensional state information, if used \cite{mnih2015human}.
+\end{itemize}
+
+Implementation details:
+\begin{itemize}
+    \item state variables used by the controller;
+    \item action space / voltage actions;
     \item reward function;
-    \item exploration method;
     \item training episodes;
-    \item simulation results.
+    \item neural network architecture, if DQN;
+    \item final selected controller.
 \end{itemize}
 
-\subsection{Actor-Critic or Model Internalization Controller}
+\subsection{Actor-Critic or Model Internalization Method}
+TODO fill using the hybrid/model-internalization folder.
 
-TODO: Add hybrid/model internalization method.
-
-Include:
-
+Theory to include:
 \begin{itemize}
-    \item policy structure;
-    \item learned or internal model;
-    \item training/tuning choices;
-    \item robustness tests;
-    \item comparison with Q-learning.
+    \item difference between value-based and policy-based methods \cite{sutton1999policy};
+    \item actor and critic roles, or model internalization concept;
+    \item why this method can improve over basic Q-learning;
+    \item robustness testing.
+\end{itemize}
+
+\subsection{Swing-Up Simulation Results}
+Suggested table:
+\begin{table}[h]
+\centering
+\caption{Swing-up controller simulation results.}
+\begin{tabular}{lccc}
+\toprule
+Controller & Success rate & Upright error & Notes \\
+\midrule
+Q-learning/DQN & TODO & TODO & TODO \\
+Model internalization & TODO & TODO & TODO \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Figures to include:
+\begin{itemize}
+    \item disk angle over time;
+    \item control voltage over time;
+    \item training return/loss curve;
+    \item error near upright.
 \end{itemize}
 
 \section{Reference Tracking}
+% Page budget: about 1 page.
+% Max-grade purpose: show the final extension beyond swing-up.
 
 \subsection{Objective}
-
-Explain that the final controller should both swing up and track a reference around the upright position.
+The final controller should use one policy to swing up and then track a reference around the upright position.
 
 \subsection{Method}
-
-TODO: Add the reference tracking controller details.
+TODO describe the reference tracking policy:
+\begin{itemize}
+    \item reference signal;
+    \item state representation;
+    \item reward function;
+    \item training setup;
+    \item how swing-up and tracking are combined.
+\end{itemize}
 
 \subsection{Simulation Results}
+Suggested table:
+\begin{table}[h]
+\centering
+\caption{Reference tracking simulation results.}
+\begin{tabular}{lccc}
+\toprule
+Controller & Success rate & Tracking RMSE & Notes \\
+\midrule
+Reference tracking policy & TODO & TODO & TODO \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-Add plots and metrics from the reference tracking results folder.
+Figures:
+\begin{itemize}
+    \item measured/simulated angle and reference on same plot;
+    \item tracking error;
+    \item voltage input.
+\end{itemize}
 
-\section{Real Setup Test Plan and Results}
-
-This section is intentionally left with room for tomorrow's experiments.
+\section{Real Setup Experiments}
+% Page budget: 0.5--1 page depending on tomorrow's results.
+% Leave this section even if the real test fails. A critical discussion helps the grade.
 
 \subsection{Test Plan}
-
-Before running on the real setup, record:
-
+Before testing, record:
 \begin{itemize}
-    \item date and location of experiment;
-    \item controller version used;
-    \item safety checks;
-    \item starting position;
+    \item date and setup used;
+    \item controller version;
     \item number of trials;
+    \item initial condition;
+    \item safety constraints;
     \item success definition;
-    \item what data was logged.
+    \item logged signals.
 \end{itemize}
 
-\subsection{Real Setup Results}
-
-TODO after tomorrow:
-
-\begin{itemize}
-    \item add trial table;
-    \item add measured angle plot;
-    \item add motor voltage plot;
-    \item add success/failure discussion;
-    \item compare real setup performance with simulation performance.
-\end{itemize}
+\subsection{Experimental Results}
+TODO fill after tomorrow's test.
 
 \begin{table}[h]
 \centering
-\caption{Real setup test results.}
+\caption{Real setup experiments.}
 \begin{tabular}{lccc}
 \toprule
-Trial & Controller & Success & Notes \\
+Trial & Controller & Success & Comment \\
 \midrule
 1 & TODO & TODO & TODO \\
 2 & TODO & TODO & TODO \\
@@ -281,67 +468,79 @@ Trial & Controller & Success & Notes \\
 \end{tabular}
 \end{table}
 
-\section{Discussion}
-
-\subsection{Comparison Between Models}
-
-Discuss GP vs ANN:
-
+Discuss:
 \begin{itemize}
-    \item prediction performance;
-    \item simulation performance;
-    \item interpretability;
-    \item training complexity;
-    \item sensitivity to hyperparameters.
+    \item whether the real setup matched simulation;
+    \item any unexpected behaviour;
+    \item noise, friction, delay, saturation, or safety issues;
+    \item what would be changed with more lab time.
 \end{itemize}
 
-\subsection{Comparison Between Controllers}
+\section{Discussion}
+% Page budget: about 1 page.
+% Max-grade purpose: this is where critical thinking and theory discussion show up.
 
-Discuss Q-learning, hybrid/model internalization, and reference tracking.
+\subsection{System Identification Discussion}
+Compare GP and ANN using:
+\begin{itemize}
+    \item accuracy;
+    \item simulation stability;
+    \item interpretability;
+    \item hyperparameter sensitivity;
+    \item computation time;
+    \item suitability for control.
+\end{itemize}
+
+\subsection{Control Discussion}
+Compare Q-learning, model internalization, and reference tracking:
+\begin{itemize}
+    \item reward design sensitivity;
+    \item sample efficiency;
+    \item robustness;
+    \item ease of tuning;
+    \item simulation-to-real transfer.
+\end{itemize}
 
 \subsection{Limitations}
-
-Mention:
-
+Be honest and specific:
 \begin{itemize}
-    \item noisy measurement data;
-    \item simulation-to-real difference;
-    \item limited real setup time;
-    \item hidden test score unknown until evaluated by lecturers;
-    \item possible overfitting in neural network tuning.
+    \item noisy disk angle measurements;
+    \item no angular velocity used in modelling, as required, but this may limit model information;
+    \item hidden test scores are not directly known;
+    \item neural networks may overfit tuning data;
+    \item real setup time is limited;
+    \item simulation model may not fully match physical setup.
+\end{itemize}
+
+\subsection{Course Theory Coverage}
+Use this paragraph to explicitly show theory knowledge from the rubric:
+\begin{itemize}
+    \item dynamic model structures, NARX, prediction, and simulation;
+    \item GP mean, covariance/kernel, hyperparameters, and sparse approximation if used;
+    \item ANN approximation, backpropagation, regularization/overfitting, recurrent networks, vanishing gradients;
+    \item RL basics: MDP, policy, value/Q-function, reward, exploration;
+    \item RL advanced: DQN, actor-critic or model internalization, robustness.
 \end{itemize}
 
 \section{Conclusion}
+% Page budget: about 0.3--0.5 page.
 
 Summarize:
-
 \begin{itemize}
-    \item best modelling result;
-    \item best control result;
-    \item whether real setup tests were successful;
-    \item main lesson learned from the project.
+    \item best GP and ANN modelling results;
+    \item whether the advanced ANN improved over the simple ANN;
+    \item best swing-up and tracking controller results;
+    \item real setup result, if available;
+    \item final lesson: systematic validation and tuning matter more than only trying a complex model.
 \end{itemize}
 
-\section*{Individual Contributions}
+\section*{Acknowledgment and Contributions}
+% Keep short. Full individual reflection is separate.
+% Include names/student numbers somewhere in the report as required by announcement.
 
-The final report can include a short summary here, but the official individual reflection should also be filled in using the provided reflection template.
-
-\begin{itemize}
-    \item TODO: Student 1 contribution.
-    \item TODO: Student 2 contribution.
-    \item TODO: Student 3 contribution.
-    \item TODO: Student 4 contribution, if applicable.
-\end{itemize}
+TODO short group contribution statement.
 
 \bibliographystyle{IEEEtran}
-\begin{thebibliography}{1}
-
-\bibitem{course}
-5SC28 Machine Learning for Systems and Control lecture and practical material.
-
-\bibitem{assignment}
-5SC28 Design Assignment, Eindhoven University of Technology, 2026.
-
-\end{thebibliography}
+\bibliography{references}
 
 \end{document}

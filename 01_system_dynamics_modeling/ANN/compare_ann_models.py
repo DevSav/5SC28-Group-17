@@ -5,6 +5,7 @@ from matplotlib import pyplot as plt
 
 from config import MODELS_DIR, PLOTS_DIR, RAW_DATA_DIR, ROOT, TEST_OUTPUTS_DIR
 from models.ann_model import ANNModel, make_narx_data
+from models.gru_ann_model import GRUANNModel, make_gru_data
 from models.lstm_ann_model import LSTMANNModel, make_lstm_data
 
 
@@ -31,31 +32,81 @@ def get_benchmark_folder():
     return folder
 
 
-def plot_prediction(th_real, narx_pred, lstm_pred):
-    plt.figure(figsize=(10, 4))
-    plt.plot(th_real[:500], label="measured")
-    plt.plot(narx_pred[:500], label="simple NARX ANN")
-    plt.plot(lstm_pred[:500], label="advanced LSTM ANN")
-    plt.xlabel("sample")
-    plt.ylabel("angle (rad)")
-    plt.title("Prediction comparison")
-    plt.legend()
+def plot_prediction(th_real, narx_pred, gru_pred, lstm_pred):
+    samples = np.arange(500)
+    error_gru = th_real[:500] - gru_pred[:500]
+    error_lstm = th_real[:500] - lstm_pred[:500]
+
+    fig, axes = plt.subplots(2, 1, figsize=(10, 6), sharex=True)
+    axes[0].plot(samples, th_real[:500], label="measured", linewidth=2)
+    axes[0].plot(samples, narx_pred[:500], label="simple NARX ANN", alpha=0.8)
+    axes[0].plot(samples, gru_pred[:500], label="advanced GRU ANN", alpha=0.8)
+    axes[0].plot(samples, lstm_pred[:500], label="advanced LSTM ANN", alpha=0.8)
+    axes[0].set_ylabel("angle (rad)")
+    axes[0].set_title("Prediction comparison")
+    axes[0].legend(fontsize=8)
+
+    axes[1].plot(samples, error_gru, label="GRU error")
+    axes[1].plot(samples, error_lstm, label="LSTM error")
+    axes[1].axhline(0.0, color="black", linewidth=0.8)
+    axes[1].set_xlabel("sample")
+    axes[1].set_ylabel("error (rad)")
+    axes[1].set_title("Prediction error for recurrent models")
+    axes[1].legend(fontsize=8)
+
     plt.tight_layout()
     plt.savefig(PLOTS_DIR / "ann_prediction_comparison.png", dpi=150)
+    plt.close(fig)
+
+    plt.figure(figsize=(10, 4))
+    plt.plot(samples, error_gru, label="GRU error")
+    plt.plot(samples, error_lstm, label="LSTM error")
+    plt.axhline(0.0, color="black", linewidth=0.8)
+    plt.xlabel("sample")
+    plt.ylabel("error (rad)")
+    plt.title("Zoomed prediction error comparison")
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(PLOTS_DIR / "ann_prediction_error_zoom.png", dpi=150)
     plt.close()
 
 
-def plot_simulation(th_real, narx_sim, lstm_sim):
-    plt.figure(figsize=(10, 4))
-    plt.plot(th_real[:800], label="measured")
-    plt.plot(narx_sim[:800], label="simple NARX ANN")
-    plt.plot(lstm_sim[:800], label="advanced LSTM ANN")
-    plt.xlabel("sample")
-    plt.ylabel("angle (rad)")
-    plt.title("Simulation comparison")
-    plt.legend()
+def plot_simulation(th_real, narx_sim, gru_sim, lstm_sim):
+    samples = np.arange(800)
+    error_gru = th_real[:800] - gru_sim[:800]
+    error_lstm = th_real[:800] - lstm_sim[:800]
+
+    fig, axes = plt.subplots(2, 1, figsize=(10, 6), sharex=True)
+    axes[0].plot(samples, th_real[:800], label="measured", linewidth=2)
+    axes[0].plot(samples, narx_sim[:800], label="simple NARX ANN", alpha=0.8)
+    axes[0].plot(samples, gru_sim[:800], label="advanced GRU ANN", alpha=0.8)
+    axes[0].plot(samples, lstm_sim[:800], label="advanced LSTM ANN", alpha=0.8)
+    axes[0].set_ylabel("angle (rad)")
+    axes[0].set_title("Simulation comparison")
+    axes[0].legend(fontsize=8)
+
+    axes[1].plot(samples, error_gru, label="GRU error")
+    axes[1].plot(samples, error_lstm, label="LSTM error")
+    axes[1].axhline(0.0, color="black", linewidth=0.8)
+    axes[1].set_xlabel("sample")
+    axes[1].set_ylabel("error (rad)")
+    axes[1].set_title("Simulation error for recurrent models")
+    axes[1].legend(fontsize=8)
+
     plt.tight_layout()
     plt.savefig(PLOTS_DIR / "ann_simulation_comparison.png", dpi=150)
+    plt.close(fig)
+
+    plt.figure(figsize=(10, 4))
+    plt.plot(samples, error_gru, label="GRU error")
+    plt.plot(samples, error_lstm, label="LSTM error")
+    plt.axhline(0.0, color="black", linewidth=0.8)
+    plt.xlabel("sample")
+    plt.ylabel("error (rad)")
+    plt.title("Zoomed simulation error comparison")
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(PLOTS_DIR / "ann_simulation_error_zoom.png", dpi=150)
     plt.close()
 
 
@@ -67,12 +118,13 @@ def plot_scores(scores):
     x = np.arange(len(names))
     width = 0.35
 
-    plt.figure(figsize=(8, 4))
+    plt.figure(figsize=(9, 4))
     plt.bar(x - width / 2, prediction_scores, width, label="prediction")
     plt.bar(x + width / 2, simulation_scores, width, label="simulation")
-    plt.xticks(x, names)
+    plt.yscale("log")
+    plt.xticks(x, names, rotation=12, ha="right")
     plt.ylabel("RMSE (degrees)")
-    plt.title("ANN model error comparison")
+    plt.title("ANN model error comparison (log scale)")
     plt.legend()
     plt.tight_layout()
     plt.savefig(PLOTS_DIR / "ann_error_barplot.png", dpi=150)
@@ -118,6 +170,20 @@ def main():
         th_test[:SIMULATION_START_SAMPLES],
         INPUT_DELAY,
         OUTPUT_DELAY,
+    )
+
+    print("Training advanced GRU ANN")
+    Xtrain_gru, Ytrain_gru = make_gru_data(u_train, th_train, history=HISTORY)
+    Xval_gru, Yval_gru = make_gru_data(u_val, th_val, history=HISTORY)
+    Xtest_gru, Ytest_gru = make_gru_data(u_test, th_test, history=HISTORY)
+
+    gru_model = GRUANNModel(hidden_size=60)
+    gru_model.fit(Xtrain_gru, Ytrain_gru, Xval_gru, Yval_gru, epochs=120)
+    gru_prediction = gru_model.predict(Xtest_gru)
+    gru_simulation = gru_model.simulate(
+        u_test,
+        th_test[:SIMULATION_START_SAMPLES],
+        history=HISTORY,
     )
 
     print("Training advanced LSTM ANN")
@@ -166,6 +232,13 @@ def main():
             "simulation_rmse_deg": rmse_degrees(th_test[skip:], narx_simulation[skip:]),
         },
         {
+            "model": "advanced GRU ANN",
+            "prediction_rmse_rad": rmse(Ytest_gru.reshape(-1), gru_prediction),
+            "prediction_rmse_deg": rmse_degrees(Ytest_gru.reshape(-1), gru_prediction),
+            "simulation_rmse_rad": rmse(th_test[skip:], gru_simulation[skip:]),
+            "simulation_rmse_deg": rmse_degrees(th_test[skip:], gru_simulation[skip:]),
+        },
+        {
             "model": "advanced LSTM ANN",
             "prediction_rmse_rad": rmse(Ytest_lstm.reshape(-1), lstm_prediction),
             "prediction_rmse_deg": rmse_degrees(Ytest_lstm.reshape(-1), lstm_prediction),
@@ -181,11 +254,13 @@ def main():
             "sample": np.arange(len(th_test)),
             "measured_angle": th_test,
             "simple_narx_simulation": narx_simulation,
+            "advanced_gru_simulation": gru_simulation,
             "advanced_lstm_simulation": lstm_simulation,
         }
     )
     comparison.to_csv(PLOTS_DIR / "ann_simulation_comparison.csv", index=False)
 
+    torch.save(gru_model, MODELS_DIR / "ann_gru_assignment_model.pt")
     torch.save(lstm_model, MODELS_DIR / "ann_lstm_tuned_assignment_model.pt")
     np.savez(
         TEST_OUTPUTS_DIR / "ann_lstm_tuned_hidden_prediction_submission.npz",
@@ -199,8 +274,8 @@ def main():
         th=th_simulated,
     )
 
-    plot_prediction(Ytest.reshape(-1), narx_prediction, lstm_prediction)
-    plot_simulation(th_test, narx_simulation, lstm_simulation)
+    plot_prediction(Ytest.reshape(-1), narx_prediction, gru_prediction, lstm_prediction)
+    plot_simulation(th_test, narx_simulation, gru_simulation, lstm_simulation)
     plot_scores(scores)
 
     print("Saved:", PLOTS_DIR / "ann_model_scores.csv")
@@ -208,6 +283,7 @@ def main():
     print("Saved:", PLOTS_DIR / "ann_prediction_comparison.png")
     print("Saved:", PLOTS_DIR / "ann_simulation_comparison.png")
     print("Saved:", PLOTS_DIR / "ann_error_barplot.png")
+    print("Saved:", MODELS_DIR / "ann_gru_assignment_model.pt")
     print("Saved:", MODELS_DIR / "ann_lstm_tuned_assignment_model.pt")
     print("Saved:", TEST_OUTPUTS_DIR / "ann_lstm_tuned_hidden_prediction_submission.npz")
     print("Saved:", TEST_OUTPUTS_DIR / "ann_lstm_tuned_hidden_simulation_submission.npz")
