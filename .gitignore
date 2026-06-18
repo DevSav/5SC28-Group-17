@@ -30,7 +30,7 @@ results/test_outputs/*
 *.docx
 
 # Original uploaded archives kept locally
-control/99_original_zip/*.zip
+99_original_archives/**/*.zip
 
 # OS files
 .DS_Store

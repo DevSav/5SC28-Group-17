@@ -32,35 +32,46 @@ The rubric mainly checks:
 - clarity of report and presentation;
 - individual contribution.
 
-## Repository Structure
+## Assignment Flow Structure
 
 ```text
-assignment_files/
-  gym-unbalanced-disk/  Required benchmark data, simulator, and checker files.
-data/
-  raw/                 Original downloaded data. Do not edit these files.
-  processed/           Cleaned data used by our scripts.
-docs/                  Assignment notes, planning, and useful references.
-notebooks/             Experiments and plots.
+01_system_dynamics_modeling/
+  ANN/                 Short guide to our ANN work.
+  GP/                  Gaussian Process work from the GP teammate.
+
+02_policy_learning_swingup/
+  01_q_learning_swingup/
+  02_hybrid_policy_model_internalization/
+
+03_single_policy_reference_tracking/
+  reference_tracking/
+
+04_reports_and_submission/
+  Notes about report files and final submission outputs.
+
+assignment_files/      Required benchmark data, simulator, and checker files.
+src/                   Python source code used by the ANN scripts.
+results/               Saved models, plots, and submission outputs.
+docs/                  Experiment log and planning notes.
 reports/               Report drafts and final report material.
-results/
-  models/              Saved trained models.
-  plots/               Figures for report and presentation.
-  test_outputs/        Output files that must be submitted.
-src/
-  models/              GP and ANN model code.
-  policies/            Reinforcement learning policy code.
-  utils/               Small helper functions.
 ```
+
+This structure follows the assignment flow:
+
+1. First we learn system dynamics models: ANN and GP.
+2. Then we learn swing-up policies.
+3. Then we extend the control work to reference tracking.
+4. Finally we collect plots, outputs, and report material.
 
 ## Simple Workflow
 
 1. Use the files in `assignment_files/gym-unbalanced-disk/`.
-2. Use notebooks only for quick experiments.
-3. Put working code in `src/`.
-4. Save final plots in `results/plots/`.
-5. Save final test outputs in `results/test_outputs/`.
-6. Write down decisions and failed attempts in `docs/experiment_log.md`.
+2. Read `01_system_dynamics_modeling/ANN/README.md` for the ANN part.
+3. Read `01_system_dynamics_modeling/GP/README_GP.md` for the GP part.
+4. Read the READMEs in `02_policy_learning_swingup/` and `03_single_policy_reference_tracking/` for the control part.
+5. Save final plots in `results/plots/`.
+6. Save final test outputs in `results/test_outputs/`.
+7. Write down decisions and failed attempts in `docs/experiment_log.md`.
 
 The experiment log is here:
 

@@ -1,13 +1,15 @@
-# Control Work
+# 02 Policy Learning: Swing-Up
 
-This folder contains the controller work from the ZIP file.
+This folder contains the swing-up controller work from the ZIP file.
 
-The original controller ZIP is kept in `99_original_zip/`.
+This matches the second main assignment step: learn a policy that can swing the disk up.
+
+The original controller ZIP is kept in `../99_original_archives/control_zip/`.
 
 ## Folder Structure
 
 ```text
-control/
+02_policy_learning_swingup/
   01_q_learning_swingup/
     DQN / Q-learning swing-up controller.
 
@@ -15,12 +17,6 @@ control/
     Hybrid policy / model-internalization style controller.
     This includes teacher data, RBF imitation, hybrid policy optimization,
     and robustness evaluation results.
-
-  03_reference_tracking/
-    DQN reference-tracking controller.
-
-  99_original_zip/
-    Original uploaded ZIP file, kept unchanged.
 ```
 
 ## What Is Already Included
@@ -33,7 +29,6 @@ Important result folders:
 01_q_learning_swingup/results_dqn_swingup/
 02_hybrid_policy_model_internalization/results_hybrid_policy_optimization/
 02_hybrid_policy_model_internalization/results_optimized_policy_robustness/
-03_reference_tracking/results_dqn_reference_tracking/
 ```
 
 ## Do We Need To Run Anything?
@@ -49,23 +44,16 @@ Run scripts only if we want to reproduce or improve the control results.
 Q-learning swing-up:
 
 ```bash
-cd control/01_q_learning_swingup
+cd 02_policy_learning_swingup/01_q_learning_swingup
 python main_train_dpn_swingup.py
 ```
 
 Hybrid/model-internalization style controller:
 
 ```bash
-cd control/02_hybrid_policy_model_internalization
+cd 02_policy_learning_swingup/02_hybrid_policy_model_internalization
 python main_optimize_hybrid_policy_simulator.py
 python main_evaluate_optimized_policy_robustness.py
-```
-
-Reference tracking:
-
-```bash
-cd control/03_reference_tracking
-python main_train_dqn_reference_tracking.py
 ```
 
 ## Notes
