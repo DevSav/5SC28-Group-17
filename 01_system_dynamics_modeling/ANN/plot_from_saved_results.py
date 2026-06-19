@@ -7,7 +7,7 @@ from config import PLOTS_DIR, SAVED_ARRAYS_DIR
 
 COLORS = {
     "measured": "black",
-    "narx": "#1f77b4",
+    "narx": "#7f7f7f",
     "gru": "#2ca02c",
     "lstm": "#ff7f0e",
 }

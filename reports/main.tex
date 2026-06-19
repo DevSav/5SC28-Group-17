@@ -60,6 +60,13 @@ Third, the controller must be extended so that one policy can swing up the disk 
 
 For the modelling part, the input is the applied motor voltage $u(k)$ and the output is the measured disk angle $\theta(k)$.
 Angular velocity was not used, following the assignment requirement \cite{assignment5sc28}.
+Fig.~\ref{fig:system_overview} shows the input-output structure used for the modelling task.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=\columnwidth]{figures/system_overview.png}}
+\caption{Input-output view of the unbalanced disk system. The applied motor voltage $u(k)$ is used as model input, and the measured disk angle $\theta(k)$ is used as model output. The figure is adapted from the assignment files.}
+\label{fig:system_overview}
+\end{figure}
 
 \subsection{Prediction and Simulation}
 
@@ -268,8 +275,34 @@ It should not only repeat the results, but also explain what was learned from th
 
 \subsection{Model Comparison}
 
-TODO: Compare GP and ANN models.
-Discuss prediction accuracy, simulation accuracy, interpretability, training effort, and limitations.
+Table~\ref{tab:ann_gp_comparison} compares the best ANN results with the final GP result.
+For the ANN, the best prediction result was obtained with the GRU model, while the best simulation result was obtained with the LSTM model.
+The GP model was a sparse delta-output GP-NARX model.
+
+\begin{table}[htbp]
+\caption{Best ANN and GP modelling results on the held-out validation split.}
+\centering
+\begin{tabular}{lcc}
+\toprule
+Model & Prediction RMSE & Simulation RMSE \\
+\midrule
+Best ANN & 0.202 deg & 1.893 deg \\
+Best GP & 0.164 deg & 1.461 deg \\
+\bottomrule
+\end{tabular}
+\label{tab:ann_gp_comparison}
+\end{table}
+
+Fig.~\ref{fig:ann_gp_comparison} shows the same comparison visually.
+The GP model obtained the lowest RMSE for both prediction and simulation on the held-out validation split.
+This suggests that the sparse delta-output GP-NARX structure captured the system dynamics slightly better than the tested ANN architectures.
+However, the ANN comparison remains useful because it shows the improvement from a simple NARX baseline to recurrent models, and because neural-network models can be extended flexibly when more data or larger architectures are available.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=\columnwidth]{figures/ann_gp_model_comparison.png}}
+\caption{Comparison of the best ANN and GP validation errors.}
+\label{fig:ann_gp_comparison}
+\end{figure}
 
 \subsection{Controller Comparison}
 
