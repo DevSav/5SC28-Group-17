@@ -33,13 +33,10 @@ TODO student numbers}
 
 \begin{abstract}
 This report presents the Group 17 design project for the modelling and control of an unbalanced disk.
-The project consists of three main parts: learning the system dynamics, learning a swing-up controller, and extending the controller to reference tracking.
-For the modelling part, the system input is the motor voltage and the measured output is the disk angle.
-The modelling part uses Gaussian Process (GP) and Artificial Neural Network (ANN) models, while the control part studies learned policies for swing-up and reference tracking.
-For the ANN modelling part, a simple NARX network is compared with recurrent GRU and LSTM networks.
-Three ANN models were implemented: a simple feedforward NARX model, a recurrent Gated Recurrent Unit (GRU) model, and a recurrent Long Short-Term Memory (LSTM) model.
-All models were evaluated on prediction and simulation tasks.
-The GRU gave the best one-step prediction result, while the LSTM gave the best simulation result.
+The project combines system identification with policy learning.
+The system dynamics are modelled using Gaussian Process (GP) and Artificial Neural Network (ANN) models, using motor voltage as input and measured disk angle as output.
+For the ANN part, a simple NARX network is compared with recurrent GRU and LSTM networks.
+The GRU gives the best one-step prediction result, while the LSTM gives the best simulation result.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -50,13 +47,9 @@ unbalanced disk, system identification, Artificial Neural Network, NARX, GRU, LS
 
 \subsection{Project Motivation}
 
-The unbalanced disk is a nonlinear dynamical system where a motor is used to rotate a disk with an uneven mass distribution.
-Because the disk is unbalanced, gravity, motor voltage, friction, and inertia together create nonlinear behaviour.
-This makes the setup useful for studying machine learning methods for system identification and control.
-
-The goal of the design project is to use methods from the course 5SC28 Machine Learning for Systems and Control on this practical system \cite{course5sc28,assignment5sc28}.
-The project is not only about getting a final working result, but also about showing a systematic engineering approach.
-This means choosing model structures, tuning hyperparameters, validating results, comparing methods, and discussing limitations.
+The unbalanced disk is a nonlinear dynamical system where a motor rotates a disk with an uneven mass distribution.
+Because gravity, friction, inertia, and motor voltage all influence the motion, the setup is useful for testing machine learning methods for modelling and control.
+The aim of the project is to apply the methods from 5SC28 in a systematic way: choose model structures, tune them, validate them, and discuss their limitations \cite{assignment5sc28}.
 
 \subsection{Assignment Objectives}
 
@@ -65,41 +58,31 @@ First, the system dynamics must be identified using both a Gaussian Process (GP)
 Second, a policy must be learned that can swing the disk up from the stable bottom position to the upright position.
 Third, the controller must be extended so that one policy can swing up the disk and track a reference around the upright position.
 
-This section describes the ANN modelling contribution to the group project.
-For this part, the considered system input is the applied motor voltage, denoted by $u(k)$.
-The considered system output is the measured disk angle, denoted by $\theta(k)$.
-Following the assignment requirement, angular velocity was not used while solving the modelling problem \cite{assignment5sc28}.
+For the modelling part, the input is the applied motor voltage $u(k)$ and the output is the measured disk angle $\theta(k)$.
+Angular velocity was not used, following the assignment requirement \cite{assignment5sc28}.
 
 \subsection{Prediction and Simulation}
 
-The learned models were tested in two different ways: prediction and simulation.
-This distinction is standard in system identification, because a model that performs well for one-step-ahead prediction does not automatically give stable long-term simulation behaviour \cite{lecture1sysid,ljung1999system}.
-In the prediction task, the model predicts the next disk angle using measured past values.
-This is a one-step-ahead task and is usually easier because the model can still use the true measured past angle values.
+The models are evaluated using both prediction and simulation.
+In prediction, the model uses measured past angles to predict the next angle.
+In simulation, the model feeds back its own previous predictions to generate a full trajectory.
+Simulation is harder because errors can accumulate over time, so both tasks are needed to judge the model properly \cite{ljung1999system}.
+The error was evaluated using the root mean squared error (RMSE):
 
-In the simulation task, the model predicts a complete trajectory.
-After the first measured starting samples, the model must use its own previous predictions as past output values.
-This is harder because small errors can be fed back into the model and can grow over time.
-For this reason, both prediction and simulation results are needed to judge whether a model has really learned useful system dynamics.
+\begin{equation}
+\mathrm{RMSE} =
+\sqrt{\frac{1}{N}\sum_{k=1}^{N}\left(\theta(k)-\hat{\theta}(k)\right)^2},
+\end{equation}
+
+where $\theta(k)$ is the measured disk angle, $\hat{\theta}(k)$ is the model output, and $N$ is the number of evaluated samples.
 
 \section{Artificial Neural Network Modelling}
 
-\subsection{ANN Modelling Goal}
+\subsection{Method}
 
 The ANN part of the assignment required at least one simple ANN model and one more advanced ANN architecture \cite{assignment5sc28}.
-The simple model was used as a baseline, while the advanced GRU and LSTM models were used to test whether recurrent architectures could improve the modelling result.
-Both models used only the motor voltage and measured disk angle.
-No angular velocity was included.
-
-The known data were split into training, validation, and test parts.
-The first 70 percent of the data were used for training, the next 15 percent for validation, and the final 15 percent for testing.
-The validation part was used during model selection, while the test part was used to compare the final models before generating the hidden-test submission files.
-
-\subsection{Simple ANN: NARX Feedforward Model}
-
-The first ANN model was a simple nonlinear autoregressive model with exogenous input (NARX).
-The idea is to predict the next disk angle from delayed motor voltages and delayed measured disk angles.
-In this project, the simple ANN used 15 delayed voltage samples and 15 delayed angle samples:
+Therefore, three models were compared: a simple feedforward NARX ANN, a recurrent GRU, and a recurrent LSTM.
+The simple NARX model predicts the next angle from delayed voltages and delayed measured angles:
 
 \begin{equation}
 \hat{\theta}(k) =
@@ -107,68 +90,19 @@ f_{\mathrm{ANN}}(u(k-15), \ldots, u(k-1),
 \theta(k-15), \ldots, \theta(k-1)).
 \end{equation}
 
-The function $f_{\mathrm{ANN}}$ was implemented as a small feedforward neural network.
-The network has one hidden layer with 50 hidden neurons and a sigmoid activation function.
-The output layer is linear because the target value is a continuous angle.
-This model is simple and close to the NARX examples used in the practical sessions \cite{lecture2ann}.
-Using neural networks for nonlinear dynamical system identification is a well-known approach, because neural networks can approximate nonlinear input-output relations from data \cite{narendra1990identification}.
-
-Before training, the input and output data were normalized using the mean and standard deviation of the training data.
-The model was trained using the Adam optimizer and mean squared error loss.
-Validation loss was checked during training, and early stopping was used to avoid keeping a model that only fitted the training data.
-This was important because a neural network can overfit if it is trained for too long.
-The use of gradient-based training follows the backpropagation idea discussed in the ANN lectures and popularized by Rumelhart, Hinton, and Williams \cite{lecture2ann,rumelhart1986learning}.
-Adam was chosen because it is a common adaptive gradient optimizer for neural-network training \cite{kingma2014adam}.
-
-The simple NARX ANN is useful as a baseline because it is easy to understand.
-However, it has a limitation: the memory of the system is fixed manually by the chosen delays.
-If the useful time dependence is longer or more complex than the selected delay window, the model may not simulate well.
-
-\subsection{Recurrent ANN Input Structure}
-
-The GRU and LSTM models use the same sequence input.
-For both models, a window of past voltage and angle values is used to predict the next angle:
+The NARX network has one hidden layer with 50 neurons and follows the practical-session structure \cite{course5sc28}.
+This model is easy to interpret and gives a useful baseline.
+The GRU and LSTM models use the same sequence input:
 
 \begin{equation}
 [(u(k-H),\theta(k-H)), \ldots, (u(k-1),\theta(k-1))]
 \rightarrow \hat{\theta}(k).
 \end{equation}
 
-In this work, the history length was $H=15$ samples.
-The difference between the GRU and LSTM models is therefore not the input data, but the recurrent layer that processes the sequence.
-
-\subsection{Advanced ANN: GRU Recurrent Model}
-
-The first advanced ANN model was a Gated Recurrent Unit (GRU) network.
-A GRU is a recurrent neural network that uses gates to decide which information from the past should be kept or updated.
-It is similar in purpose to an LSTM, but it has a simpler structure with fewer gates.
-This makes it a useful comparison because it tests whether a simpler recurrent model is already enough for the unbalanced disk data.
-
-For the GRU comparison, the history length was $H=15$ samples and the hidden size was 60.
-The model was trained with Adam and mean squared error loss.
-GRU networks were introduced as a simpler gated recurrent architecture for sequence modelling \cite{lecture3deeplearning,cho2014gru}.
-
-\subsection{Advanced ANN: LSTM Recurrent Model}
-
-The second advanced ANN model was a Long Short-Term Memory (LSTM) network.
-This was also used as an advanced ANN architecture required for the ANN part of the assignment \cite{assignment5sc28}.
-An LSTM is a recurrent neural network, meaning that it is designed for sequence data.
-In the final selected setting, the history length was $H=15$ samples and the hidden size was 60.
-The LSTM output at the last time step was passed through a linear layer to predict the next disk angle.
-The model was trained using Adam and mean squared error loss.
-The training data were again normalized using only statistics from the training set.
-
-The reason for using an LSTM is that the disk is a dynamical system.
-The current angle depends on previous inputs and previous angles, so the order of the samples matters.
-The LSTM can learn from a sequence directly and can store information in its internal state.
-This makes it more suitable for time-series modelling than a normal feedforward network when the dynamics are not fully captured by a fixed input vector.
-LSTM networks were introduced to improve recurrent neural-network learning over longer time dependencies and to reduce the vanishing-gradient problem \cite{lecture3deeplearning,hochreiter1997lstm}.
-
-\subsection{Hyperparameter Tuning}
-
-Several LSTM settings were tested to avoid selecting the final architecture by guessing.
-The tested settings changed the history length, hidden size, and number of training epochs.
-Table~\ref{tab:lstm_tuning} shows the validation results from these tuning experiments.
+with history length $H=15$.
+The difference between GRU and LSTM is the recurrent layer: GRU is simpler, while LSTM has a more detailed memory mechanism \cite{course5sc28,cho2014gru,hochreiter1997lstm}.
+All models were trained using normalized data, mean squared error loss, and the Adam optimizer \cite{kingma2014adam}.
+The known data were split into 70 percent training, 15 percent validation, and 15 percent test data.
 
 \begin{table}[htbp]
 \caption{LSTM tuning results on the held-out test split.}
@@ -186,9 +120,8 @@ History & Hidden size & Prediction RMSE & Simulation RMSE \\
 \label{tab:lstm_tuning}
 \end{table}
 
-The setting with history length 15 and hidden size 60 gave the best overall ANN result in this comparison.
-It had the lowest prediction error and the lowest simulation error among the LSTM settings that were tested.
-This setting was therefore used as the final advanced ANN model.
+Table~\ref{tab:lstm_tuning} shows the LSTM tuning runs.
+The setting with history length 15 and hidden size 60 was selected because it gave the best simulation result among the tested LSTM settings.
 
 \subsection{ANN Results}
 
@@ -211,31 +144,19 @@ Advanced LSTM ANN & 0.235 deg & 1.893 deg \\
 \end{table}
 
 Fig.~\ref{fig:ann_errors} shows the same comparison visually.
-The logarithmic scale is used because the NARX simulation error is much larger than the recurrent-model errors.
-Without the logarithmic scale, the difference between GRU and LSTM is difficult to see.
+The left plot uses a logarithmic scale because the NARX simulation error is much larger than the recurrent-model errors.
+The right plot only compares GRU and LSTM, so the smaller difference between these two models is easier to see.
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=\columnwidth]{figures/ann_error_barplot.png}}
-\caption{Prediction and simulation RMSE for the ANN models.}
+\centerline{\includegraphics[width=\columnwidth]{figures/ann_three_model_comparison.png}}
+\caption{Prediction and simulation RMSE for the three ANN models.}
 \label{fig:ann_errors}
 \end{figure}
 
 Both recurrent models clearly performed better than the simple NARX ANN.
-For prediction, the GRU gave the lowest RMSE with 0.202 degrees.
-For simulation, the LSTM gave the lowest RMSE with 1.893 degrees.
-This difference is important because it shows why both prediction and simulation should be evaluated.
-A model can be best for one-step prediction without being best for long-term simulation.
-The likely reason is that prediction and simulation test different behaviour.
-During prediction, the model receives measured past angles, so the task is mainly to fit the local one-step input-output relation.
-The GRU has fewer gates and parameters than the LSTM, which can make it easier to train for this direct prediction task.
-During simulation, the model must feed back its own previous predicted angles.
-In that case, small errors can accumulate over time.
-The LSTM has a more expressive memory mechanism, which likely helped it keep the simulated trajectory more stable over multiple time steps.
-
-The simple NARX ANN was still useful because it gave a clear baseline.
-It showed that a small feedforward network can learn some part of the input-output relation, but it was not strong enough for long simulation.
-The GRU and LSTM were better because they used the time ordering of the data more naturally.
-This agrees with the theory from recurrent neural networks, where the model is built to process sequences rather than independent input vectors.
+The GRU gave the best prediction result, while the LSTM gave the best simulation result.
+This is reasonable because prediction is a one-step task using measured past angles, while simulation feeds the model's own predictions back into the input.
+The simpler GRU can fit the one-step relation very well, but the LSTM memory mechanism appears to be more stable over a longer simulated trajectory.
 
 Fig.~\ref{fig:ann_prediction} and Fig.~\ref{fig:ann_simulation} show the prediction and simulation errors for the recurrent models.
 These plots are used instead of only showing the angle trajectories, because the GRU and LSTM trajectories are very close to the measured angle and are hard to compare by eye.
@@ -252,30 +173,12 @@ These plots are used instead of only showing the angle trajectories, because the
 \label{fig:ann_simulation}
 \end{figure}
 
-\subsection{ANN Output Files and Figures}
+\subsection{ANN Discussion}
 
-The final ANN prediction and simulation files were generated for the hidden test data.
-For submission, the tuned LSTM prediction and simulation files were selected, because the LSTM had the best simulation performance.
-
-The most relevant figures for the final report are included in this section.
-Additional trajectory plots are kept with the project files, but the error plots are clearer for comparing the recurrent models.
-
-\subsection{Critical Discussion of the ANN Models}
-
-The ANN results show that model structure matters.
-The simple NARX ANN had a reasonable structure for one-step prediction, but its simulation result was poor compared with the recurrent models.
-This suggests that the feedforward model did not capture the longer-term dynamics well enough.
-Because simulation repeatedly feeds the model's own output back into the input, a small modelling error can quickly create a large trajectory error.
-
-The GRU and LSTM gave much better results, but they also have limitations.
-They are less transparent than the simple NARX ANN because the learned recurrent state is not easy to interpret physically.
-They also require hyperparameter choices such as history length, hidden size, number of epochs, and learning rate.
-Only a limited set of settings was tested, so it is possible that an even better LSTM setting exists.
-There is also a risk of overfitting to the known validation/test split, although this was reduced by using a separate validation set and by comparing both prediction and simulation results.
-
-Overall, the LSTM was selected as the final ANN model because simulation performance is more demanding and more relevant for checking whether the model learned the system dynamics over time.
-The GRU result is still useful in the report because it shows that a simpler recurrent model can predict very accurately, while the LSTM gives the best trajectory simulation.
-Together, the GRU and LSTM satisfy the assignment requirement for advanced ANN architectures and give a clear improvement over the simple ANN baseline.
+The GRU was added to check whether the extra complexity of an LSTM was really needed.
+This gives a useful comparison: GRU is slightly better for prediction, but LSTM is better for simulation.
+Since simulation is the more difficult task for a dynamics model, the tuned LSTM output files were selected as the final ANN submission files.
+The main limitation is that only a small set of recurrent hyperparameters was tested, so a better setting may still exist.
 
 \section{Gaussian Process Modelling}
 
@@ -292,7 +195,7 @@ Also mention the input delays, output delays, and whether the model predicts the
 \subsection{Kernel and Hyperparameters}
 
 TODO: Explain the kernel choice and the hyperparameters.
-Useful theory points are the GP mean function, covariance function, marginal likelihood, and hyperparameter optimization \cite{rasmussen2006gpml}.
+Useful theory points are the GP mean function, covariance function, marginal likelihood, and hyperparameter optimization.
 If sparse GP was used, explain why it was needed and what approximation was made.
 
 \subsection{GP Results}
@@ -316,14 +219,14 @@ Mention the voltage limit and how success is measured.
 
 TODO: Explain the Q-learning/DQN controller.
 Include the state, action, reward function, exploration method, training setup, and final simulation result.
-Useful theory points are the Markov decision process, Q-function, reward, and exploration-exploitation trade-off \cite{sutton2018reinforcement}.
-If a DQN was used, cite the DQN reference \cite{mnih2015human}.
+Useful theory points are the Markov decision process, Q-function, reward, and exploration-exploitation trade-off.
+If a DQN was used, cite the DQN reference.
 
 \subsection{Model Internalization or Actor-Critic Controller}
 
 TODO: Explain the second control method.
 Describe how it differs from the Q-learning/DQN method and why it was tested.
-If an actor-critic or policy-gradient idea was used, cite the policy-gradient reference \cite{sutton1999policy}.
+If an actor-critic or policy-gradient idea was used, cite the policy-gradient reference.
 
 \subsection{Swing-Up Results}
 

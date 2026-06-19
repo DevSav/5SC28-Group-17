@@ -4,6 +4,12 @@ from matplotlib import pyplot as plt
 from config import PLOTS_DIR
 
 
+PREDICTION_COLOR = "#4c78a8"
+SIMULATION_COLOR = "#f58518"
+GRU_COLOR = "#2ca02c"
+LSTM_COLOR = "#ff7f0e"
+
+
 def add_labels(bars):
     for bar in bars:
         height = bar.get_height()
@@ -27,12 +33,14 @@ def plot_all_errors(data):
         data["prediction_rmse_deg"],
         width,
         label="prediction",
+        color=PREDICTION_COLOR,
     )
     simulation_bars = plt.bar(
         [i + width / 2 for i in x],
         data["simulation_rmse_deg"],
         width,
         label="simulation",
+        color=SIMULATION_COLOR,
     )
 
     add_labels(prediction_bars)
@@ -54,8 +62,8 @@ def plot_tuning_only(tuning_data):
         labels.append(f"h={int(row['history'])}, n={int(row['hidden_size'])}")
 
     plt.figure(figsize=(9, 5))
-    plt.plot(labels, tuning_data["prediction_rmse_deg"], "o-", label="prediction")
-    plt.plot(labels, tuning_data["simulation_rmse_deg"], "o-", label="simulation")
+    plt.plot(labels, tuning_data["prediction_rmse_deg"], "o-", label="prediction", color=GRU_COLOR)
+    plt.plot(labels, tuning_data["simulation_rmse_deg"], "o-", label="simulation", color=LSTM_COLOR)
     plt.xticks(rotation=25, ha="right")
     plt.ylabel("RMSE (degrees)")
     plt.title("LSTM tuning comparison")
