@@ -17,9 +17,9 @@ sys.path.insert(0, str(DQN_DIR))
 import main_train_dpn_swingup as dqn  # noqa: E402
 
 
-BLUE_TO_RED = LinearSegmentedColormap.from_list(
-    "blue_to_red",
-    ["#2f6fdd", "#d62728"],
+RED_TO_BLUE = LinearSegmentedColormap.from_list(
+    "red_to_blue",
+    ["#d62728", "#2f6fdd"],
 )
 
 
@@ -52,7 +52,7 @@ def disk_xy(theta, length=0.85):
 
 def draw_disk_axis(axis, theta, title):
     close = closeness_to_upright(theta)
-    color = BLUE_TO_RED(close)
+    color = RED_TO_BLUE(close)
     x, y = disk_xy(theta)
 
     axis.plot([0, 0], [0, 0.9], "--", color="0.75", linewidth=1.0)
@@ -95,7 +95,7 @@ def make_phase_colored_plot(result):
     close = np.array([closeness_to_upright(value) for value in theta[:-1]])
 
     fig, axis = plt.subplots(figsize=(8, 3.5))
-    line_collection = LineCollection(segments, cmap=BLUE_TO_RED, linewidth=2.2)
+    line_collection = LineCollection(segments, cmap=RED_TO_BLUE, linewidth=2.2)
     line_collection.set_array(close)
     axis.add_collection(line_collection)
 

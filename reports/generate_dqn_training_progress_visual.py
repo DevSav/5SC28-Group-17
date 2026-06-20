@@ -19,9 +19,9 @@ OUTPUT = ROOT / "reports" / "figures" / "dqn_training_progress_pendulums.png"
 GIF_OUTPUT = ROOT / "reports" / "figures" / "dqn_training_progress_pendulums.gif"
 
 THETA_TARGET = np.pi
-BLUE_TO_RED = LinearSegmentedColormap.from_list(
-    "blue_to_red",
-    ["#2f6fdd", "#d62728"],
+RED_TO_BLUE = LinearSegmentedColormap.from_list(
+    "red_to_blue",
+    ["#d62728", "#2f6fdd"],
 )
 
 
@@ -36,7 +36,7 @@ def disk_xy(theta, length=0.82):
 
 
 def draw_pendulum(axis, theta, upright_ratio, title, subtitle):
-    color = BLUE_TO_RED(upright_ratio)
+    color = RED_TO_BLUE(upright_ratio)
     x, y = disk_xy(theta)
 
     axis.plot([0, 0], [0, 0.9], "--", color="0.75", linewidth=1.0)
@@ -78,7 +78,7 @@ def main():
     fig.text(
         0.5,
         0.02,
-        "Blue means poor swing-up performance; red means the episode spent more time near upright.",
+        "Red means poor swing-up performance; blue means the episode spent more time near upright.",
         ha="center",
         fontsize=9,
     )
