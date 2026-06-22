@@ -27,6 +27,11 @@ data/processed/*
 
 # Original uploaded archives kept locally
 99_original_archives/**/*.zip
+99_original_archives/
+gym-unbalanced-disk-master-controller.zip
+
+# Local Canvas submission staging folder
+04_reports_and_submission/Group17_submission_package/
 
 # OS files
 .DS_Store

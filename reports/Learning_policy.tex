@@ -220,7 +220,7 @@ through it.
     \centering
     \begin{tabular}{lc}
         \toprule
-        Metric & Mean \(\pm\) std. \\
+        Metric & Value \\
         \midrule
         Evaluation seeds & 20 \\
         Success rate & 1.000 \\
@@ -411,7 +411,7 @@ refinement \cite{storn1997differential,powell1964efficient}. The optimized param
 \begin{equation}
     p^{\star} =
     \begin{bmatrix}
-        0.6256 & 1.3515 & 2.6738 & 1.9433
+        0.5785 & 1.3974 & 2.7481 & 2.3309
     \end{bmatrix}^{\top}.
 \label{eq:hybrid_optimized_parameters}
 \end{equation}
@@ -428,20 +428,20 @@ reducing input saturation.
         \toprule
         Metric & Initial & Optimized \\
         \midrule
-        Final error [rad] & $0.021$ & $-0.013$ \\
+        Final error [rad] & $-0.025$ & $-0.011$ \\
         Min. abs. error [rad] & $0.021$ & $0.011$ \\
-        Last-window error [rad] & $0.024$ & $0.014$ \\
-        Saturation ratio & $0.173$ & $0.003$ \\
-        Upright ratio & $0.803$ & $0.850$ \\
-        RBF mode ratio & $0.827$ & $0.870$ \\
+        Last-window error [rad] & $0.025$ & $0.013$ \\
+        Saturation ratio & $0.233$ & $0.000$ \\
+        Upright ratio & $0.753$ & $0.847$ \\
+        RBF mode ratio & $0.767$ & $0.867$ \\
         \bottomrule
     \end{tabular}
     \label{tab:hybrid_optimization}
 \end{table}
 
 As shown in Table~\ref{tab:hybrid_optimization}, the optimized hybrid policy
-reduced the last-window error from \(0.024\) rad to \(0.014\) rad and decreased
-the saturation ratio from \(0.173\) to \(0.003\). Thus, the simulator-based
+reduced the last-window error from \(0.025\) rad to \(0.013\) rad and decreased
+the saturation ratio from \(0.233\) to \(0.000\). Thus, the simulator-based
 policy improvement made the controller more accurate and less dependent on
 saturated voltage input.
 
@@ -476,7 +476,7 @@ and the maximum absolute input was $2.7481$ V, which remains below the
     \centering
     \begin{tabular}{lc}
         \toprule
-        Metric & Mean \(\pm\) std. \\
+        Metric & Value \\
         \midrule
         Final error [rad] & $0.0010 \pm 0.0118$ \\
         Min. abs. error [rad] & $0.0099 \pm 0.0005$ \\

@@ -25,10 +25,10 @@
 \title{Machine Learning for Modelling and Control of an Unbalanced Disk\\
 Group 17 Design Project}
 
-\author{\IEEEauthorblockN{Savvas Saragiotis, Yilong Li, TODO Student 3 Name}
+\author{\IEEEauthorblockN{Savvas Saragiotis, Yilong Li, Bowen Cheng}
 \IEEEauthorblockA{\textit{5SC28 Machine Learning for Systems and Control}\\
 \textit{Eindhoven University of Technology}\\
-1888706, 2299445, TODO student number 3}
+1888706, 2299445, 2289415}
 }
 
 \begin{document}
@@ -52,7 +52,7 @@ reliably capture the upright position.
 \end{abstract}
 
 \begin{IEEEkeywords}
-unbalanced disk, system identification, Artificial Neural Network, Gaussian Process, NARX, GP-NARX, GRU, LSTM, prediction, simulation
+unbalanced disk, system identification, artificial neural network, Gaussian process, NARX, DQN, reinforcement learning, swing-up control, reference tracking
 \end{IEEEkeywords}
 
 \section{Introduction}
@@ -208,10 +208,7 @@ physical system.
 The comparison between methods should also be interpreted carefully.
 The ANN and GP models were both tested on prediction and simulation
 tasks, but they were not tuned with exactly the same number of trials or
-the same type of hyperparameters. The true measured outputs for the
-hidden benchmark tests were not available during development, so the
-final hidden-test files could only be checked for the required format
-before being evaluated by the course staff.
+the same type of hyperparameters.
 
 \section{Conclusion}
 

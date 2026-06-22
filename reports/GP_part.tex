@@ -135,7 +135,9 @@ free-run simulation.
 
 Preliminary direct-output GP experiments compared kernels before the
 final sparse delta-output GP was trained
-(Table~\ref{tab:gp_kernel_comparison}).
+(Table~\ref{tab:gp_kernel_comparison}). These preliminary results were
+kept as a record of the model choices, while the final sparse GP result
+is stored in the current result CSV file.
 
 \begin{table}[htbp]
 \caption{Initial GP kernel comparison on the validation data.}
@@ -318,8 +320,5 @@ most reliable in regions covered by the training data. In free-run
 simulation only the mean was propagated, so uncertainty was not fully
 propagated through time.
 
-Finally, the true measured outputs for the hidden benchmark tests were
-not available during development. Consequently, the final hidden
-prediction and simulation files could only be checked for the required
-format and dimensions before submission. Their actual performance will
-be evaluated by the course staff.
+The final GP result was used to generate the requested prediction and
+simulation submission files.
