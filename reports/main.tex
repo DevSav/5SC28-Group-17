@@ -7,6 +7,10 @@
 \usepackage{textcomp}
 \usepackage{xcolor}
 \usepackage{booktabs}
+\usepackage{float}
+\usepackage{tabularx}
+\usepackage{makecell}
+\usepackage{subcaption}
 
 % Report requirements from the announcement:
 % - IEEE two-column format.
@@ -21,10 +25,10 @@
 \title{Machine Learning for Modelling and Control of an Unbalanced Disk\\
 Group 17 Design Project}
 
-\author{\IEEEauthorblockN{TODO Student 1 Name, TODO Student 2 Name, TODO Student 3 Name}
+\author{\IEEEauthorblockN{Savvas Saragiotis, Yilong Li, TODO Student 3 Name}
 \IEEEauthorblockA{\textit{5SC28 Machine Learning for Systems and Control}\\
 \textit{Eindhoven University of Technology}\\
-TODO student numbers}
+1888706, 2299445, TODO student number 3}
 }
 
 \begin{document}
@@ -32,11 +36,19 @@ TODO student numbers}
 \maketitle
 
 \begin{abstract}
-This report presents the Group 17 design project for the modelling and control of an unbalanced disk.
-The project combines system identification with policy learning.
-The system dynamics are modelled using Artificial Neural Network (ANN) and Gaussian Process (GP) models, using motor voltage as input and measured disk angle as output.
-For the ANN part, a simple NARX network is compared with recurrent GRU and LSTM networks, while the GP part uses a sparse delta-output GP-NARX model.
-The best ANN prediction result is obtained with the GRU, the best ANN simulation result is obtained with the LSTM, and the final GP gives the lowest modelling errors among the tested configurations.
+This report presents the Group 17 design project on modelling and control of
+an unbalanced disk. The system dynamics were identified from motor voltage and
+measured disk angle data using ANN and GP models. A simple NARX ANN was
+compared with GRU and LSTM models, while the final GP model used a sparse
+delta-output GP-NARX structure. The GP gave the lowest recorded prediction and
+simulation errors. For control, a DQN controller was trained for swing-up, a
+hybrid energy-pumping and RBF controller was optimized in simulation, and a
+reference-conditioned DQN was used for swing-up and tracking. The simulated
+controllers achieved successful swing-up, and the hybrid RBF controller gave
+the best final stabilization accuracy. Preliminary real-setup tests showed a
+clear simulation-to-real gap: the DQN did not swing up under conservative
+voltage limits, while the hybrid controller generated larger motion but did not
+reliably capture the upright position.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -73,7 +85,7 @@ Fig.~\ref{fig:system_overview} shows the input-output structure used for the mod
 The models are evaluated using both prediction and simulation.
 In prediction, the model uses measured past angles to predict the next angle.
 In simulation, the model feeds back its own previous predictions to generate a full trajectory.
-Simulation is harder because errors can accumulate over time, so both tasks are needed to judge the model properly \cite{ljung1999system}.
+Simulation is harder because errors can accumulate over time, so both tasks are needed to judge the model properly \cite{course5sc28}.
 The error was evaluated using the root mean squared error (RMSE):
 
 \begin{equation}
@@ -89,67 +101,13 @@ where \(\theta(k)\) is the measured disk angle, \(\hat{\theta}(k)\) is the model
 \section{GP Modelling Method}
 \input{GP_part}
 
-\section{Policy Learning}
+\input{Learning_policy}
 
-This section should be completed by the control group member.
-It should describe the learned policies used to swing up the disk and keep it near the upright position.
+\input{Tracking_Reference}
 
-\subsection{Swing-Up Objective}
-
-TODO: Explain the control goal.
-The controller should move the disk from the stable bottom position to the unstable upright position and keep it there.
-Mention the voltage limit and how success is measured.
-
-\subsection{Q-Learning or DQN Controller}
-
-TODO: Explain the Q-learning/DQN controller.
-Include the state, action, reward function, exploration method, training setup, and final simulation result.
-Useful theory points are the Markov decision process, Q-function, reward, and exploration-exploitation trade-off.
-If a DQN was used, cite the DQN reference.
-
-\subsection{Model Internalization or Actor-Critic Controller}
-
-TODO: Explain the second control method.
-Describe how it differs from the Q-learning/DQN method and why it was tested.
-If an actor-critic or policy-gradient idea was used, cite the policy-gradient reference.
-
-\subsection{Swing-Up Results}
-
-TODO: Add a table with the final swing-up results.
-Useful metrics are success rate, mean absolute angle error near upright, and control effort.
-Also include one angle plot and one voltage plot if space allows.
-
-\section{Reference Tracking}
-
-TODO: Explain how the controller was extended from swing-up to reference tracking.
-The report should describe the reference signal, the reward function, and how one policy handles both swing-up and tracking.
-
-\subsection{Reference Tracking Results}
-
-TODO: Add the final tracking result table.
-Useful metrics are tracking RMSE, success rate, and tracking ratio.
-Include a plot with the reference angle and the measured/simulated disk angle.
-
-\section{Real Setup Experiments}
-
-This section should be filled in after the real setup tests.
-If the tests are not successful, still describe what happened and why.
-The discussion of practical limitations is useful for the final grade.
-
-\subsection{Test Plan}
-
-TODO: Record the date, controller version, number of trials, initial condition, safety checks, and logged signals.
-
-\subsection{Experimental Results}
-
-TODO: Add the real setup results.
-Compare the real setup behaviour with the simulation behaviour.
-Mention possible causes of differences, such as friction, sensor noise, delay, saturation, or model mismatch.
+\input{Real_Setup_Test}
 
 \section{Discussion}
-
-This section should compare the main choices made in the project.
-It should not only repeat the results, but also explain what was learned from them.
 
 \subsection{Model Comparison}
 
@@ -171,42 +129,11 @@ Best GP & 0.164 deg & 1.461 deg \\
 \label{tab:ann_gp_comparison}
 \end{table}
 
-Fig.~\ref{fig:ann_gp_comparison} shows the same comparison visually.
-The GP model obtained the lowest recorded prediction and simulation
-RMSE. This suggests that the sparse delta-output GP-NARX structure
-captured the system dynamics slightly better than the tested ANN
-architectures. The ANN comparison remains useful because it shows the
-improvement from a simple NARX baseline to recurrent models, and because
-neural networks can be extended flexibly when more data or larger
-architectures are available.
-
-\begin{figure}[htbp]
-\centerline{\includegraphics[width=\columnwidth]{figures/ann_gp_model_comparison.png}}
-\caption{Comparison of the best recorded ANN and GP modelling errors.}
-\label{fig:ann_gp_comparison}
-\end{figure}
-
-It should be noted that the two values reported for the ``Best ANN''
-represent the best results obtained by two different recurrent models.
-The prediction value was obtained with the GRU, whereas the simulation
-value was obtained with the LSTM. The table therefore compares the best
-ANN result for each modelling task with the corresponding result of the
-final GP model.
-
-Relative to the best ANN results, the GP reduced prediction RMSE by
-about \(19\%\) and simulation RMSE by about \(23\%\).
-The improvement in simulation is particularly relevant because free-run
-simulation tests whether the identified model can reproduce the system
-dynamics recursively, without receiving the measured angle at every
-time step.
-
-The results indicate that the selected GP structure was well suited to
-the amount and type of identification data available in this project.
-The GP also provides a predictive variance in addition to the predicted
-mean. This gives an indication of model uncertainty, which may be useful
-for model validation or uncertainty-aware control. However, the present
-comparison is based only on RMSE, so this probabilistic information was
-not included directly in the performance score.
+The GP model obtained the lowest recorded prediction and simulation RMSE.
+Relative to the best ANN results, it reduced prediction RMSE by about
+\(19\%\) and simulation RMSE by about \(23\%\). The ``Best ANN'' row combines
+the GRU prediction result and the LSTM simulation result, since these were the
+best ANN models for the two tasks.
 
 The ANN and GP approaches also have different practical advantages.
 The GP provides a probabilistic framework and achieved high accuracy
@@ -227,11 +154,41 @@ therefore be interpreted as a practical comparison of the final
 recorded models, not as a perfectly controlled benchmark.
 
 
+\subsection{Controller Discussion}
 
-\subsection{Controller Comparison}
+This project evaluated three learning-based control results for the unbalanced
+disk: a DQN swing-up controller, an optimized hybrid RBF swing-up controller,
+and a reference-conditioned DQN tracking controller. In simulation, all three
+controllers achieved the intended task. The fixed-target DQN reached a success
+rate of \(1.000\) over 20 seeds, with a last-window angle error of
+\(0.0317\) rad. The optimized hybrid RBF controller also achieved a success
+rate of \(1.000\), with a smaller last-window error of \(0.0129\) rad and zero
+input saturation over 50 seeds. For the reference-tracking task, the
+reference-conditioned DQN achieved a success rate of \(1.000\), a last-window
+tracking error of \(0.0310\) rad, and a tracking ratio of \(0.9192\).
 
-TODO: Compare the control methods.
-Discuss robustness, tuning difficulty, success rate, and simulation-to-real transfer.
+The DQN is the clearest Q-learning-based solution, but its discrete action set
+makes the input less smooth and its performance depends on reward shaping. The
+hybrid RBF controller uses more prior structure: energy-pumping for swing-up
+and an RBF policy for local stabilization. This improves simulated accuracy and
+input behavior, but it is not a fully end-to-end reinforcement learning method.
+
+The real setup experiments showed that good simulation performance did not
+directly guarantee successful hardware transfer. The DQN safe deployment did
+not swing up the disk, mainly because the real test used a conservative
+\(\pm 2\) V voltage limit instead of the \(\pm 3\) V action range used during
+training, and because the measured real-state information differed from the
+simulation state. The hybrid RBF controller transferred better in the
+energy-building phase and brought the disk close to the upright region several
+times, but it still failed to achieve reliable capture and sustained
+stabilization. This indicates that the local stabilization and switching logic
+were not robust enough under real-system conditions.
+
+Overall, value-based learning and hybrid policy improvement both solved the
+simulated swing-up task, and the reference-conditioned DQN extended the task to
+tracking. The main remaining limitation is the simulation-to-real gap.
+
+
 
 \subsection{Limitations}
 
@@ -258,9 +215,25 @@ before being evaluated by the course staff.
 
 \section{Conclusion}
 
-TODO: Summarize the final project results in one short section.
-Mention the best modelling result, the best control result, and the outcome of the real setup test if available.
-Also state what the group would improve with more time.
+This project studied both data-driven modelling and learning-based control of
+the unbalanced disk. For the modelling task, all models used the required input
+and output signals: motor voltage and measured disk angle. Among the ANN
+models, the GRU gave the best one-step prediction result and the LSTM gave the
+best free-run simulation result. The sparse delta-output GP-NARX model achieved
+the lowest recorded modelling errors, showing that the selected GP structure
+was well suited to the available identification data.
+
+For the control task, the DQN controller successfully learned swing-up and
+upright stabilization in simulation. The reference-conditioned DQN also showed
+that one learned policy can combine swing-up with tracking around the upright
+position. The optimized hybrid RBF controller gave the best simulated
+steady-state accuracy and avoided input saturation in the robustness test.
+However, the real setup experiments showed that good simulation performance did
+not directly transfer to hardware. The DQN was too limited by the conservative
+voltage bound, while the hybrid controller transferred the swing-up energy
+building better but did not reliably capture the disk near upright. The main
+future improvements are real-system retuning, better angular-velocity
+estimation, and training with more uncertainty or real-system data.
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}

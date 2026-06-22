@@ -4,10 +4,8 @@ The ANN part required at least one simple ANN model and one more
 advanced ANN architecture \cite{assignment5sc28}. Therefore, three
 models were compared: a feedforward NARX ANN, a GRU, and an LSTM.
 
-The modelling problem is dynamic, so the current angle cannot be
-predicted from the current voltage only. Past inputs and past outputs
-must also be used. A general nonlinear autoregressive model with
-exogenous input (NARX) can be written as
+Since the system is dynamic, past inputs and outputs are needed. A
+nonlinear autoregressive model with exogenous input (NARX) is written as
 
 \begin{equation}
 \begin{aligned}
@@ -22,14 +20,10 @@ u(k-1),\ldots,u(k-n_b)
 \label{eq:ann_narx_general}
 \end{equation}
 
-where \(n_a\) and \(n_b\) are the output and input memory lengths. In
-the simple ANN model, the unknown nonlinear function \(f(\cdot)\) is
-approximated by a feedforward neural network. In the implementation,
-both memory lengths were set to 15, so the model uses the previous
-15 motor-voltage samples and previous 15 measured angle samples.
-
-The NARX network has one hidden layer with 50 neurons and follows the practical-session structure \cite{course5sc28}.
-This model is easy to interpret and gives a useful baseline.
+where \(n_a\) and \(n_b\) are the output and input memory lengths. The
+simple ANN approximates \(f(\cdot)\) with a feedforward network with one
+hidden layer of 50 neurons, following the practical-session structure
+\cite{course5sc28}. Both memory lengths were set to 15.
 In prediction mode, the delayed angles in \eqref{eq:ann_narx_general}
 are measured values. In simulation mode, the model must use its own
 previous outputs instead of the measured previous angles. In other
@@ -40,11 +34,9 @@ words, simulation uses the same model structure as
 test than one-step prediction: small errors can be fed back into the
 model and affect later samples.
 
-The GRU and LSTM models use the same input-output history, with history
-length \(H=15\). The difference is that the recurrent models read the
-history as an ordered sequence of voltage-angle pairs instead of one
-flattened vector.
-A recurrent neural network updates an internal state while reading this
+The GRU and LSTM use the same history length \(H=15\), but read it as an
+ordered sequence of voltage-angle pairs instead of one flattened vector.
+A recurrent network updates an internal state while reading this
 sequence:
 
 \begin{equation}
@@ -59,11 +51,8 @@ W_o\mathbf{h}_{k-1}+b_o .
 \label{eq:ann_recurrent_state}
 \end{equation}
 
-The hidden state \(\mathbf{h}_j\) acts as a memory of the previous
-samples. This is useful for the unbalanced disk because the measured
-angle depends on the recent motion of the disk, not only on the most
-recent voltage sample. The difference between GRU and LSTM is the
-recurrent layer: GRU is simpler, while LSTM has a more detailed memory
+The hidden state \(\mathbf{h}_j\) stores information from previous
+samples. The GRU is simpler, while the LSTM has a more detailed memory
 mechanism \cite{course5sc28,cho2014gru,hochreiter1997lstm}.
 All models were trained using normalized data, mean squared error loss,
 and the Adam optimizer \cite{kingma2014adam}. The known data were split
@@ -73,14 +62,9 @@ raw training samples, 5250 validation samples, and 5250 test samples.
 Because the ANN inputs use past samples, the supervised training set was
 slightly smaller: 24485 training examples for history length 15.
 
-For the ANN models, the main capacity choices were the amount of past
-information given to the model and the number of hidden units.
-Both choices affect how flexible the neural network can be.
-Seven recorded ANN configurations were compared in total: one simple
-NARX ANN, one GRU ANN, one final LSTM ANN, and four additional LSTM
-tuning runs.
-
-The LSTM tuning runs are shown in Table~\ref{tab:lstm_tuning}.
+Seven ANN configurations were compared: one NARX ANN, one GRU, one final
+LSTM, and four LSTM tuning runs. The LSTM tuning runs are shown in
+Table~\ref{tab:lstm_tuning}.
 
 \begin{table}[htbp]
 \caption{LSTM tuning results on the held-out test split.}
@@ -98,12 +82,11 @@ History & Hidden size & Prediction RMSE & Simulation RMSE \\
 \label{tab:lstm_tuning}
 \end{table}
 
-The setting with history length 15 and hidden size 60 was selected
-because it gave the best LSTM simulation result. This architecture was
-then retrained together with the NARX and GRU models for the final ANN
-comparison. Since neural-network training is stochastic, the retrained
-LSTM result in Table~\ref{tab:ann_results} differs slightly from the
-tuning value.
+History length 15 and hidden size 60 gave the best LSTM simulation
+result. This architecture was then retrained with the NARX and GRU for
+the final comparison. Since training is stochastic, the retrained LSTM
+result in Table~\ref{tab:ann_results} differs slightly from the tuning
+value.
 
 \subsection{ANN Results}
 
@@ -126,9 +109,9 @@ Advanced LSTM ANN & 0.235 deg & 1.893 deg \\
 \label{tab:ann_results}
 \end{table}
 
-Fig.~\ref{fig:ann_errors} shows the same comparison visually.
-The left plot uses a logarithmic scale because the NARX simulation error is much larger than the recurrent-model errors.
-The right plot only compares GRU and LSTM, so the smaller difference between these two models is easier to see.
+Fig.~\ref{fig:ann_errors} shows the same comparison. The left plot uses a
+logarithmic scale because the NARX simulation error is much larger; the
+right plot zooms in on GRU and LSTM.
 
 \begin{figure}[htbp]
 \centerline{\includegraphics[width=\columnwidth]{figures/ann_three_model_comparison.png}}
@@ -136,12 +119,11 @@ The right plot only compares GRU and LSTM, so the smaller difference between the
 \label{fig:ann_errors}
 \end{figure}
 
-Both recurrent models clearly performed better than the simple NARX ANN.
-The GRU gave the best prediction result, while the LSTM gave the best simulation result.
-This is reasonable because prediction uses measured past angles, while
-simulation feeds the model's own predictions back into the input. The
-simpler GRU fits the one-step relation very well, but the LSTM memory
-mechanism appears more stable over a longer simulated trajectory.
+Both recurrent models clearly outperformed the simple NARX ANN. The GRU
+gave the best prediction result, while the LSTM gave the best simulation
+result. This is reasonable because prediction uses measured past angles,
+whereas simulation feeds the model's own predictions back into the
+input.
 
 Fig.~\ref{fig:ann_prediction} shows the prediction errors for the recurrent models.
 This plot is used instead of only showing angle trajectories, because
@@ -165,11 +147,8 @@ feed back its own previous predictions.
 
 \subsection{ANN Discussion}
 
-The GRU was added to check whether the extra complexity of an LSTM was really needed.
-This gives a useful comparison: GRU is slightly better for prediction, but LSTM is better for simulation.
-The main limitation is that only a small set of recurrent hyperparameters was tested, so a better setting may still exist.
-The ANN simulation task is also sensitive to error accumulation, because
-the model recursively uses its own predictions as inputs.
-This explains why the simple NARX ANN performs much worse in simulation than in prediction.
-Finally, the ANN output used here is a point prediction.
-It does not directly indicate the reliability of each prediction.
+The GRU was added to check whether the extra LSTM complexity was needed.
+GRU is slightly better for prediction, but LSTM is better for simulation.
+The main limitations are the small hyperparameter search, error
+accumulation in simulation, and the fact that the ANN gives point
+predictions without uncertainty estimates.
